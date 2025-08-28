@@ -1,0 +1,325 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for Smart TV */
+:root {
+  --focus-ring-color: #3b82f6;
+  --focus-ring-width: 3px;
+  --focus-bg-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Better font rendering for old browsers */
+body {
+  font-family: Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  min-height: 100vh;
+}
+
+/* TV Container Layout */
+.tv-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+
+/* Side Navigation */
+.tv-sidebar {
+  width: 80px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border-radius: 0 20px 20px 0;
+  backdrop-filter: blur(10px);
+}
+
+.tv-nav-item {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tv-nav-item-focused {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(1.1);
+  color: white;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+.tv-nav-logo {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.tv-nav-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.tv-nav-label {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Main Content Area */
+.tv-main-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+/* Hero Section */
+.tv-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+  min-height: 300px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.tv-hero-focused {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  background: rgba(59, 130, 246, 0.1);
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.tv-hero-content {
+  flex: 1;
+  color: white;
+}
+
+.tv-hero-logo {
+  margin-bottom: 20px;
+}
+
+.tv-logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #60a5fa;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.tv-hero-title h1 {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.tv-hero-title h2 {
+  font-size: 36px;
+  font-weight: 300;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.tv-hero-title p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.tv-hero-image {
+  flex: 0 0 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tv-duck-container {
+  position: relative;
+  text-align: center;
+}
+
+.tv-duck {
+  font-size: 120px;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+}
+
+.tv-duck-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Plugin Section */
+.tv-plugin-section {
+  color: white;
+}
+
+.tv-section-title {
+  font-size: 24px;
+  font-weight: 300;
+  margin-bottom: 30px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.tv-plugin-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tv-plugin-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tv-plugin-card-focused {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+  border-color: var(--focus-ring-color);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+}
+
+.tv-plugin-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.tv-plugin-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.tv-plugin-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tv-special-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #10b981;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Focus styles optimized for TV */
+.tv-focus {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
+  background-color: var(--focus-bg-color);
+  transform: scale(1.05);
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Smooth transitions for better UX */
+.tv-focusable {
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.tv-focusable:hover {
+  transform: scale(1.02);
+}
+
+/* Responsive design for different TV screen sizes */
+@media (max-width: 1200px) {
+  .tv-plugin-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .tv-hero-title h1 {
+    font-size: 36px;
+  }
+  
+  .tv-hero-title h2 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 900px) {
+  .tv-plugin-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tv-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .tv-hero-image {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .tv-plugin-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tv-main-content {
+    padding: 20px;
+  }
+  
+  .tv-sidebar {
+    width: 60px;
+  }
+  
+  .tv-nav-item {
+    width: 45px;
+    height: 45px;
+  }
+}
