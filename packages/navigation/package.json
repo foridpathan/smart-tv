@@ -1,0 +1,41 @@
+{
+  "name": "@smart-tv/navigation",
+  "version": "0.0.1",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": "./dist/index.cjs.js",
+    "./styles.css": "./dist/index.css"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "tsc -w",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@smart-tv/eslint-config": "workspace:*",
+    "@smart-tv/typescript-config": "workspace:*",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/lodash": "^4.17.20",
+    "@types/react": "^19.1.0",
+    "core-js": "^3.45.1",
+    "eslint": "^9.33.0",
+    "rollup": "^4.52.0",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "tslib": "^2.4.0",
+    "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

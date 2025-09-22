@@ -1,0 +1,74 @@
+/*
+  tailwind-legacy.css
+
+  Small helper and fallbacks for older browsers that don't support
+  modern CSS features used by Tailwind (flex gap, logical properties, etc.).
+
+  Usage: import this file before the main shared styles in apps that need
+  to support older browsers:
+
+    @import "@smart-tv/tailwind-config/tailwind-legacy.css";
+    @import "@smart-tv/tailwind-config";
+
+  The file is intentionally conservative — it provides helper classes and
+  conditional fallbacks using @supports checks so modern browsers ignore it.
+*/
+
+/* 1) Flex gap fallback: add margins when gap is not supported */
+@supports not (gap: 1rem) {
+  /* Utility: use .legacy-flex-gap on the flex container and set --gap on it */
+  .legacy-flex-gap {
+    --legacy-gap: var(--gap, 1rem);
+  }
+
+  .legacy-flex-gap > * {
+    /* apply right margin as fallback; last-child resets it */
+    margin-right: var(--legacy-gap);
+  }
+
+  .legacy-flex-gap > *:last-child {
+    margin-right: 0;
+  }
+
+  /* If the container is column-oriented, switch to margin-bottom */
+  .legacy-flex-gap.column > * {
+    margin-right: 0;
+    margin-bottom: var(--legacy-gap);
+  }
+
+  .legacy-flex-gap.column > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* 2) Logical property fallbacks: provide physical equivalents for common use-cases */
+@supports not (padding-inline-start: 1px) {
+  /* Helper class for horizontal padding using physical properties */
+  .px-inline {
+    padding-left: var(--px-inline, 1rem);
+    padding-right: var(--px-inline, 1rem);
+  }
+
+  .mx-inline {
+    margin-left: var(--mx-inline, 1rem);
+    margin-right: var(--mx-inline, 1rem);
+  }
+}
+
+/* 3) Small normalize for older browsers */
+/* Make images responsive when object-fit isn't available */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 4) Accessibility / focus outline fallbacks */
+:focus {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+/* 5) Example helpers you can adopt in your markup
+   - Add `.legacy-flex-gap` to flex containers that rely on `gap` in modern CSS
+   - Use `.px-inline` on elements that use `padding-inline` in modern CSS
+*/

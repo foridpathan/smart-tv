@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@repo/tailwind-config";
+@import "@smart-tv/tailwind-config";
 
 :root {
   --foreground-rgb: 0, 0, 0;

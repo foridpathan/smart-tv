@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es5", "dom", "es2015","es2017"],
+    "module": "NodeNext",
+    "declaration": true,
+    "declarationDir": "dist/types",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["dist", "build", "node_modules"]
+}
