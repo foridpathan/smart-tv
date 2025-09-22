@@ -1,16 +1,17 @@
 {
   "extends": "@smart-tv/typescript-config/base.json",
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "dist",
+    "declaration": false,
+  // no declaration files for the browser bundle
     "noImplicitAny": true,
+  "declarationMap": false,
     "stripInternal": true,
     "esModuleInterop": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES5",
     "jsx": "react",
-    "allowSyntheticDefaultImports": true,
+  "allowSyntheticDefaultImports": true,
     "lib": ["es5", "es2015", "es2017", "dom"],
     "baseUrl": ".",
     "paths": {

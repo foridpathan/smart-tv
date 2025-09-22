@@ -1,11 +1,3 @@
-// import { ReactNode } from 'react';
-
-// Context provider for Smart TV app focus/navigation
-// export const AppProvider = ({ children }: { children: ReactNode }) => {
-//   // TODO: Add TV-specific context, remote event listeners, etc.
-//   return <>{children}</>;
-// };
-
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {

@@ -1,6 +1,5 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// postcss plugins are loaded from the package CJS config
 
 module.exports = {
   mode: 'production',
@@ -11,10 +10,39 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: [
-          { loader: 'babel-loader' },
-          { loader: 'ts-loader' }
+          { loader: 'ts-loader' },
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    targets: { chrome: '35' },
+                    useBuiltIns: 'entry',
+                    corejs: 3
+                  }
+                ],
+                ['@babel/preset-react', { runtime: 'automatic' }]
+              ]
+            }
+          }
         ],
         exclude: /node_modules/
+      },
+      // Transpile modern JS inside node_modules (some packages ship ESM/modern builds)
+      {
+        test: /\.m?js$/,
+        include: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [[
+              '@babel/preset-env',
+              { targets: { chrome: '35' } }
+            ]]
+          }
+        }
       },
       {
         test: /\.css$/i,
@@ -51,14 +79,35 @@ module.exports = {
       };
     })()
   },
-  externals: [/^lodash(\/.+)?$/],
+  // no externals for the app bundle — include lodash in the build
   output: {
-    filename: 'index.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    clean: true,
-    globalObject: 'this'
+    globalObject: 'this',
+    // ensure webpack runtime emits ES5-friendly syntax
+  //   environment: {
+  //     arrowFunction: false,
+  //     const: false,
+  //     destructuring: false,
+  //     forOf: false,
+  //     dynamicImport: false,
+  //     module: false
+  //   }
   },
+  // optimization: {
+  //   minimize: true,
+  //   minimizer: [
+  //     new TerserPlugin({
+  //       terserOptions: {
+  //         ecma: 5,
+  //         compress: { ecma: 5 },
+  //         mangle: true,
+  //         output: { ecma: 5 }
+  //       }
+  //     })
+  //   ]
+  // },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',

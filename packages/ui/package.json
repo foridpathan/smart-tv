@@ -14,10 +14,117 @@
       "default": "./dist/index.js"
     },
     "./styles.css": "./dist/index.css",
-    "./*": "./dist/*.js"
+    "./core": {
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.js",
+      "default": "./dist/core/index.js"
+    },
+    "./core/*": "./dist/core/*.js",
+    "./components": {
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.js",
+      "default": "./dist/components/index.js"
+    },
+    "./components/*": "./dist/components/*.js",
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.js",
+      "default": "./dist/hooks/index.js"
+    },
+    "./hooks/*": "./dist/hooks/*.js",
+    "./layout": {
+      "import": "./dist/layout/index.js",
+      "require": "./dist/layout/index.js",
+      "default": "./dist/layout/index.js"
+    },
+    "./layout/*": "./dist/layout/*.js",
+    "./media": {
+      "import": "./dist/media/index.js",
+      "require": "./dist/media/index.js",
+      "default": "./dist/media/index.js"
+    },
+    "./media/*": "./dist/media/*.js",
+    "./navigation": {
+      "import": "./dist/navigation/index.js",
+      "require": "./dist/navigation/index.js",
+      "default": "./dist/navigation/index.js"
+    },
+    "./navigation/*": "./dist/navigation/*.js",
+    "./overlay": {
+      "import": "./dist/overlay/index.js",
+      "require": "./dist/overlay/index.js",
+      "default": "./dist/overlay/index.js"
+    },
+    "./overlay/*": "./dist/overlay/*.js",
+    "./search": {
+      "import": "./dist/search/index.js",
+      "require": "./dist/search/index.js",
+      "default": "./dist/search/index.js"
+    },
+    "./search/*": "./dist/search/*.js",
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.js",
+      "default": "./dist/utils/index.js"
+    },
+    "./utils/*": "./dist/utils/*.js"
   },
   "typesVersions": {
     "*": {
+      "core": [
+        "dist/core/index.d.ts"
+      ],
+      "core/*": [
+        "dist/core/*.d.ts"
+      ],
+      "components": [
+        "dist/components/index.d.ts"
+      ],
+      "components/*": [
+        "dist/components/*.d.ts"
+      ],
+      "hooks": [
+        "dist/hooks/index.d.ts"
+      ],
+      "hooks/*": [
+        "dist/hooks/*.d.ts"
+      ],
+      "layout": [
+        "dist/layout/index.d.ts"
+      ],
+      "layout/*": [
+        "dist/layout/*.d.ts"
+      ],
+      "media": [
+        "dist/media/index.d.ts"
+      ],
+      "media/*": [
+        "dist/media/*.d.ts"
+      ],
+      "navigation": [
+        "dist/navigation/index.d.ts"
+      ],
+      "navigation/*": [
+        "dist/navigation/*.d.ts"
+      ],
+      "overlay": [
+        "dist/overlay/index.d.ts"
+      ],
+      "overlay/*": [
+        "dist/overlay/*.d.ts"
+      ],
+      "search": [
+        "dist/search/index.d.ts"
+      ],
+      "search/*": [
+        "dist/search/*.d.ts"
+      ],
+      "utils": [
+        "dist/utils/index.d.ts"
+      ],
+      "utils/*": [
+        "dist/utils/*.d.ts"
+      ],
       "*": [
         "dist/*.d.ts",
         "dist/index.d.ts"
@@ -38,7 +145,6 @@
     "react": "^18"
   },
   "devDependencies": {
-    "@smart-tv/core": "workspace:*",
     "@smart-tv/eslint-config": "workspace:*",
     "@smart-tv/tailwind-config": "workspace:*",
     "@smart-tv/typescript-config": "workspace:*",

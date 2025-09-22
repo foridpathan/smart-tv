@@ -1,11 +1,13 @@
-import React from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import ReactDOMClient from 'react-dom/client';
-import App from './App';
-// Import shared Tailwind styles from the monorepo package
 import '@smart-tv/tailwind-config';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
 
-const element = document.querySelector('#root')
-
-const root = ReactDOMClient.createRoot(element!);
-root.render(<App />);
+const mountEl = document.querySelector('#root');
+if (mountEl) {
+	const root = createRoot(mountEl);
+	root.render(<App />);
+} else {
+	// no root element found — nothing to mount
+	// keep silent to avoid throwing in legacy browsers where DOM may differ
+}

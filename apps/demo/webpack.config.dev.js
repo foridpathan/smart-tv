@@ -12,14 +12,34 @@ module.exports = {
         test: /\.tsx?$/,
         use: [
           {
-            loader: 'babel-loader'
-          },
-          {
             loader: 'ts-loader',
             options: { transpileOnly: true }
+          },
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                ['@babel/preset-env', { targets: { chrome: '35' } }],
+                ['@babel/preset-react', { runtime: 'automatic' }]
+              ]
+            }
           }
         ],
         exclude: /node_modules/
+      },
+      // Transpile modern JS inside node_modules for dev as well
+      {
+        test: /\.m?js$/,
+        include: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [[
+              '@babel/preset-env',
+              { targets: { chrome: '35' } }
+            ]]
+          }
+        }
       },
       {
         test: /\.css$/i,
