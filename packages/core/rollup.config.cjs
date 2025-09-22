@@ -34,7 +34,7 @@ module.exports = {
     esbuild({
       include: /\.(ts|tsx)$/,
       sourceMap: true,
-      target: "es2017",
+      target: "es2015",
       tsconfig: "./tsconfig.json",
       minify: false,
     }),

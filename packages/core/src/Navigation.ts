@@ -20,7 +20,7 @@ const KEY_ENTER = "enter";
 
 export type Direction = "up" | "down" | "left" | "right";
 
-type DistanceCalculationMethod = "center" | "edges" | "corners";
+export type DistanceCalculationMethod = "center" | "edges" | "corners";
 
 type DistanceCalculationFunction = (
   refCorners: Corners,
@@ -184,7 +184,7 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
   return newKeyMap;
 };
 
-class SpatialNavigationService {
+class NavigationService {
   private focusableComponents: { [index: string]: FocusableComponent };
 
   private visualDebugger: VisualDebugger | null;
@@ -509,7 +509,7 @@ class SpatialNavigationService {
     const isVerticalDirection =
       direction === DIRECTION_DOWN || direction === DIRECTION_UP;
 
-    const refCorners = SpatialNavigationService.getRefCorners(
+    const refCorners = NavigationService.getRefCorners(
       direction,
       false,
       currentLayout
@@ -520,25 +520,25 @@ class SpatialNavigationService {
         // If layout is undefined, deprioritize this sibling by returning Infinity
         return Number.POSITIVE_INFINITY;
       }
-      const siblingCorners = SpatialNavigationService.getRefCorners(
+      const siblingCorners = NavigationService.getRefCorners(
         direction,
         true,
         sibling.layout
       );
 
-      const isAdjacentSlice = SpatialNavigationService.isAdjacentSlice(
+      const isAdjacentSlice = NavigationService.isAdjacentSlice(
         refCorners,
         siblingCorners,
         isVerticalDirection
       );
 
       const primaryAxisFunction = isAdjacentSlice
-        ? SpatialNavigationService.getPrimaryAxisDistance
-        : SpatialNavigationService.getSecondaryAxisDistance;
+        ? NavigationService.getPrimaryAxisDistance
+        : NavigationService.getSecondaryAxisDistance;
 
       const secondaryAxisFunction = isAdjacentSlice
-        ? SpatialNavigationService.getSecondaryAxisDistance
-        : SpatialNavigationService.getPrimaryAxisDistance;
+        ? NavigationService.getSecondaryAxisDistance
+        : NavigationService.getPrimaryAxisDistance;
 
       const primaryAxisDistance = primaryAxisFunction(
         refCorners,
@@ -779,7 +779,7 @@ class SpatialNavigationService {
           this.logIndex += 1;
         }
 
-        const keyCode = SpatialNavigationService.getKeyCode(event);
+        const keyCode = NavigationService.getKeyCode(event);
         const eventType = this.getEventType(keyCode);
 
         if (!eventType) {
@@ -834,7 +834,7 @@ class SpatialNavigationService {
 
       // When throttling then make sure to only throttle key down and cancel any queued functions in case of key up
       this.keyUpEventListener = (event: KeyboardEvent) => {
-        const keyCode = SpatialNavigationService.getKeyCode(event);
+        const keyCode = NavigationService.getKeyCode(event);
         const eventType = this.getEventType(keyCode);
 
         if (eventType !== undefined) {
@@ -1064,7 +1064,7 @@ class SpatialNavigationService {
         return;
       }
       const currentCutoffCoordinate =
-        SpatialNavigationService.getCutoffCoordinate(
+        NavigationService.getCutoffCoordinate(
           isVerticalDirection,
           isIncrementalDirection,
           false,
@@ -1085,7 +1085,7 @@ class SpatialNavigationService {
             return false;
           }
           const siblingCutoffCoordinate =
-            SpatialNavigationService.getCutoffCoordinate(
+            NavigationService.getCutoffCoordinate(
               isVerticalDirection,
               isIncrementalDirection,
               true,
@@ -1126,7 +1126,7 @@ class SpatialNavigationService {
       }
 
       if (this.visualDebugger) {
-        const refCorners = SpatialNavigationService.getRefCorners(
+        const refCorners = NavigationService.getRefCorners(
           direction,
           false,
           layout
@@ -1667,7 +1667,7 @@ class SpatialNavigationService {
   }
 
   /**
-   * Checks whether the focusableComponent is actually participating in spatial navigation (in other words, is a
+   * Checks whether the focusableComponent is actually participating in navigation (in other words, is a
    * 'focusable' focusableComponent). Seems less confusing than calling it isFocusableFocusableComponent()
    */
   isParticipatingFocusableComponent(focusKey: string) {
@@ -1835,7 +1835,7 @@ class SpatialNavigationService {
 /**
  * Export singleton
  */
-export const SpatialNavigation = new SpatialNavigationService();
+export const Navigation = new NavigationService();
 
 export const {
   init,
@@ -1850,4 +1850,4 @@ export const {
   getCurrentFocusKey,
   doesFocusableExist,
   updateRtl,
-} = SpatialNavigation;
+} = Navigation;

@@ -10,7 +10,9 @@
     @import "@smart-tv/tailwind-config"; // main shared styles
 */
 
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @theme {
   --color-blue-1000: #2a8af6;

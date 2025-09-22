@@ -1,11 +1,15 @@
 {
-  "name": "@smart-tv/navigation",
+  "name": "@smart-tv/core",
   "version": "0.0.1",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.cjs.js",
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
+    },
     "./styles.css": "./dist/index.css"
   },
   "license": "MIT",

@@ -1,0 +1,22 @@
+{
+  "extends": "@smart-tv/typescript-config/base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "dist",
+    "noImplicitAny": true,
+    "stripInternal": true,
+    "esModuleInterop": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES5",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es5", "es2015", "es2017", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules", "dist"]
+}

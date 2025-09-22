@@ -8,10 +8,24 @@
     "dist"
   ],
   "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "default": "./dist/index.js"
+    },
     "./styles.css": "./dist/index.css",
     "./*": "./dist/*.js"
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*.d.ts",
+        "dist/index.d.ts"
+      ]
+    }
+  },
   "license": "MIT",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
     "build:components": "tsc",
@@ -21,11 +35,12 @@
     "lint": "eslint src --max-warnings 0"
   },
   "peerDependencies": {
-    "react": "^19"
+    "react": "^18"
   },
   "devDependencies": {
     "@smart-tv/eslint-config": "workspace:*",
     "@smart-tv/tailwind-config": "workspace:*",
+    "@smart-tv/core": "workspace:*",
     "@smart-tv/typescript-config": "workspace:*",
     "@tailwindcss/cli": "^4.1.5",
     "@types/react": "^19.1.0",

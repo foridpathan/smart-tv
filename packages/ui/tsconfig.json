@@ -1,7 +1,9 @@
 {
   "extends": "@smart-tv/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
   },
   "include": ["src"],
   "exclude": ["dist", "build", "node_modules"]

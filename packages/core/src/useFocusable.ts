@@ -1,21 +1,21 @@
-import noop from 'lodash/noop';
-import uniqueId from 'lodash/uniqueId';
+import noop from "lodash/noop";
+import uniqueId from "lodash/uniqueId";
 import {
   RefObject,
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState
-} from 'react';
+  useState,
+} from "react";
 import {
   Direction,
   FocusableComponentLayout,
   FocusDetails,
   KeyPressDetails,
-  SpatialNavigation
-} from './Navigation';
-import { useFocusContext } from './useFocusContext';
+  Navigation,
+} from "./Navigation";
+import { useFocusContext } from "./useFocusContext";
 
 export type EnterPressHandler<P = object> = (
   props: P | undefined,
@@ -32,7 +32,7 @@ export type ArrowPressHandler<P = object> = (
 
 export type ArrowReleaseHandler<P = object> = (
   direction: string,
-  props: P | undefined,
+  props: P | undefined
 ) => void;
 
 export type FocusHandler<P = object> = (
@@ -90,7 +90,7 @@ const useFocusableHook = <P>({
   onArrowRelease = noop,
   onFocus = noop,
   onBlur = noop,
-  extraProps
+  extraProps,
 }: UseFocusableConfig<P> = {}): UseFocusableResult => {
   const onEnterPressHandler = useCallback(
     (details?: KeyPressDetails) => {
@@ -100,7 +100,7 @@ const useFocusableHook = <P>({
   );
 
   const onEnterReleaseHandler = useCallback(() => {
-  onEnterRelease(extraProps);
+    onEnterRelease(extraProps);
   }, [onEnterRelease, extraProps]);
 
   const onArrowPressHandler = useCallback(
@@ -109,9 +109,12 @@ const useFocusableHook = <P>({
     [extraProps, onArrowPress]
   );
 
-  const onArrowReleaseHandler = useCallback((direction: string) => {
-  onArrowRelease(direction, extraProps);
-  }, [onArrowRelease, extraProps])
+  const onArrowReleaseHandler = useCallback(
+    (direction: string) => {
+      onArrowRelease(direction, extraProps);
+    },
+    [onArrowRelease, extraProps]
+  );
 
   const onFocusHandler = useCallback(
     (layout: FocusableComponentLayout, details?: FocusDetails) => {
@@ -138,13 +141,13 @@ const useFocusableHook = <P>({
    * Either using the propFocusKey passed in, or generating a random one
    */
   const focusKey = useMemo(
-    () => propFocusKey || uniqueId('sn:focusable-item-'),
+    () => propFocusKey || uniqueId("sn:focusable-item-"),
     [propFocusKey]
   );
 
   const focusSelf = useCallback(
     (focusDetails: FocusDetails = {}) => {
-      SpatialNavigation.setFocus(focusKey, focusDetails);
+      Navigation.setFocus(focusKey, focusDetails);
     },
     [focusKey]
   );
@@ -152,7 +155,7 @@ const useFocusableHook = <P>({
   useEffect(() => {
     const node = ref.current;
 
-    SpatialNavigation.addFocusable({
+    Navigation.addFocusable({
       focusKey,
       // Navigation expects a non-null HTMLElement; ref.current can be null during SSR
       node: node as unknown as HTMLElement,
@@ -173,12 +176,12 @@ const useFocusableHook = <P>({
       focusBoundaryDirections,
       autoRestoreFocus,
       forceFocus,
-      focusable
+      focusable,
     });
 
     return () => {
-      SpatialNavigation.removeFocusable({
-        focusKey
+      Navigation.removeFocusable({
+        focusKey,
       });
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -186,7 +189,7 @@ const useFocusableHook = <P>({
   useEffect(() => {
     const node = ref.current;
 
-    SpatialNavigation.updateFocusable(focusKey, {
+    Navigation.updateFocusable(focusKey, {
       node: node as unknown as HTMLElement,
       preferredChildFocusKey,
       focusable,
@@ -197,7 +200,7 @@ const useFocusableHook = <P>({
       onArrowPress: onArrowPressHandler,
       onArrowRelease: onArrowReleaseHandler,
       onFocus: onFocusHandler,
-      onBlur: onBlurHandler
+      onBlur: onBlurHandler,
     });
   }, [
     focusKey,
@@ -210,7 +213,7 @@ const useFocusableHook = <P>({
     onArrowPressHandler,
     onArrowReleaseHandler,
     onFocusHandler,
-    onBlurHandler
+    onBlurHandler,
   ]);
 
   return {
@@ -218,7 +221,7 @@ const useFocusableHook = <P>({
     focusSelf,
     focused,
     hasFocusedChild,
-    focusKey // returns either the same focusKey as passed in, or generated one
+    focusKey, // returns either the same focusKey as passed in, or generated one
   };
 };
 
