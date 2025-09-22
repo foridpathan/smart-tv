@@ -1082,7 +1082,8 @@ class SmartTvNavigationService {
       const siblings = filter(this.focusableComponents, (component) => {
         if (
           component.parentFocusKey === parentFocusKey &&
-          component.focusable
+          component.focusable &&
+          component.layout // Ensure layout is defined
         ) {
           this.updateLayout(component.focusKey);
           const siblingCutoffCoordinate =
@@ -1127,21 +1128,25 @@ class SmartTvNavigationService {
       }
 
       if (this.visualDebugger && layout) {
-        const refCorners = SmartTvNavigationService.getRefCorners(
-          direction,
-          false,
-          layout
-        );
-        this.visualDebugger.drawPoint(refCorners.a.x, refCorners.a.y);
-        this.visualDebugger.drawPoint(refCorners.b.x, refCorners.b.y);
+        if (typeof direction === "string") {
+          const refCorners = SmartTvNavigationService.getRefCorners(
+            direction,
+            false,
+            layout
+          );
+          this.visualDebugger.drawPoint(refCorners.a.x, refCorners.a.y);
+          this.visualDebugger.drawPoint(refCorners.b.x, refCorners.b.y);
+        }
       }
 
-      const sortedSiblings = this.sortSiblingsByPriority(
-        siblings,
-        layout,
-        direction,
-        focusKey
-      );
+      const sortedSiblings = typeof direction === "string"
+        ? this.sortSiblingsByPriority(
+            siblings,
+            layout,
+            direction,
+            focusKey
+          )
+        : [];
 
       const nextComponent = first(sortedSiblings);
 
@@ -1200,7 +1205,7 @@ class SmartTvNavigationService {
    * Returns the current focus key
    */
   getCurrentFocusKey(): string {
-    return this.focusKey;
+    return this.focusKey ?? "";
   }
 
   /**
@@ -1422,11 +1427,15 @@ class SmartTvNavigationService {
      * Parent nodes are created after children, and child may focus itself.
      * If so, it's required to check if parent lies on a path to focused child.
      */
-    let currentComponent = this.focusableComponents[this.focusKey];
+    let currentComponent = this.focusKey ? this.focusableComponents[this.focusKey] : undefined;
     while (currentComponent) {
       if (currentComponent.parentFocusKey === focusKey) {
-        this.updateParentsHasFocusedChild(this.focusKey, {});
-        this.updateParentsLastFocusedChild(this.focusKey);
+        if (this.focusKey) {
+          this.updateParentsHasFocusedChild(this.focusKey, {});
+        }
+        if (this.focusKey !== null) {
+          this.updateParentsLastFocusedChild(this.focusKey);
+        }
         break;
       }
       currentComponent =
@@ -1506,19 +1515,32 @@ class SmartTvNavigationService {
 
   setCurrentFocusedKey(newFocusKey: string, focusDetails: FocusDetails) {
     if (
+      this.focusKey !== null &&
       this.isFocusableComponent(this.focusKey) &&
       newFocusKey !== this.focusKey
     ) {
       const oldComponent = this.focusableComponents[this.focusKey];
-      oldComponent.onUpdateFocus(false);
-      oldComponent.onBlur(
-        this.getNodeLayoutByFocusKey(this.focusKey),
-        focusDetails
-      );
+      if (oldComponent) {
+        oldComponent.onUpdateFocus(false);
+        oldComponent.onBlur(
+          this.getNodeLayoutByFocusKey(this.focusKey) ?? {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            node: oldComponent.node,
+          },
+          focusDetails
+        );
 
-      oldComponent.node?.removeAttribute?.("data-focused");
+        oldComponent.node?.removeAttribute?.("data-focused");
 
-      this.log("setCurrentFocusedKey", "onBlur", oldComponent);
+        this.log("setCurrentFocusedKey", "onBlur", oldComponent);
+      }
     }
 
     this.focusKey = newFocusKey;
@@ -1526,19 +1548,31 @@ class SmartTvNavigationService {
     if (this.isFocusableComponent(this.focusKey)) {
       const newComponent = this.focusableComponents[this.focusKey];
 
-      if (this.shouldFocusDOMNode && newComponent.node) {
-        newComponent.node.focus(this.domNodeFocusOptions);
+      if (newComponent) {
+        if (this.shouldFocusDOMNode && newComponent.node) {
+          newComponent.node.focus(this.domNodeFocusOptions);
+        }
+
+        newComponent.node?.setAttribute?.("data-focused", "true");
+
+        newComponent.onUpdateFocus(true);
+          newComponent.onFocus(
+          this.getNodeLayoutByFocusKey(this.focusKey) ?? {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            node: newComponent.node,
+          },
+          focusDetails
+        );
+
+        this.log("setCurrentFocusedKey", "onFocus", newComponent);
       }
-
-      newComponent.node?.setAttribute?.("data-focused", "true");
-
-      newComponent.onUpdateFocus(true);
-      newComponent.onFocus(
-        this.getNodeLayoutByFocusKey(this.focusKey),
-        focusDetails
-      );
-
-      this.log("setCurrentFocusedKey", "onFocus", newComponent);
     }
   }
 
@@ -1638,6 +1672,7 @@ class SmartTvNavigationService {
   isParticipatingFocusableComponent(focusKey: string) {
     return (
       this.isFocusableComponent(focusKey) &&
+      this.focusableComponents[focusKey] &&
       this.focusableComponents[focusKey].focusable
     );
   }
@@ -1646,9 +1681,19 @@ class SmartTvNavigationService {
     focusKey: string,
     focusDetails: FocusDetails
   ) {
-    if (this.isParticipatingFocusableComponent(focusKey)) {
+    if (this.isParticipatingFocusableComponent(focusKey) && this.focusableComponents[focusKey]) {
       this.focusableComponents[focusKey].onFocus(
-        this.getNodeLayoutByFocusKey(focusKey),
+        this.getNodeLayoutByFocusKey(focusKey) ?? {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          node: this.focusableComponents[focusKey]?.node,
+        },
         focusDetails
       );
     }
@@ -1658,9 +1703,19 @@ class SmartTvNavigationService {
     focusKey: string,
     focusDetails: FocusDetails
   ) {
-    if (this.isParticipatingFocusableComponent(focusKey)) {
+    if (this.isParticipatingFocusableComponent(focusKey) && this.focusableComponents[focusKey]) {
       this.focusableComponents[focusKey].onBlur(
-        this.getNodeLayoutByFocusKey(focusKey),
+        this.getNodeLayoutByFocusKey(focusKey) ?? {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          node: this.focusableComponents[focusKey]?.node,
+        },
         focusDetails
       );
     }
@@ -1691,7 +1746,7 @@ class SmartTvNavigationService {
      */
     if (!focusKey || focusKey === ROOT_FOCUS_KEY) {
       // eslint-disable-next-line no-param-reassign
-      focusKey = this.getForcedFocusKey();
+      focusKey = this.getForcedFocusKey() ?? ROOT_FOCUS_KEY;
     }
 
     const newFocusKey = this.getNextFocusKey(focusKey);
