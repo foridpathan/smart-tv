@@ -1,4 +1,13 @@
-'use client';
+// import { ReactNode } from 'react';
+
+// Context provider for Smart TV app focus/navigation
+// export const AppProvider = ({ children }: { children: ReactNode }) => {
+//   // TODO: Add TV-specific context, remote event listeners, etc.
+//   return <>{children}</>;
+// };
+
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
     getCurrentFocusKey,
     destroy as navigationDestroy,
@@ -6,12 +15,10 @@ import {
     navigateByDirection as navigationNavigateByDirection,
     setFocus as navigationSetFocus,
     updateRtl as navigationUpdateRtl
-} from "@smart-tv/core";
-import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+} from "./Navigation";
 
 // Minimal shape of the app context
-export interface AppContextValue {
+export interface AppProviderValue {
     label: string;
     setLabel: (label: string) => void;
     init: typeof navigationInit;
@@ -22,9 +29,9 @@ export interface AppContextValue {
     setRtl: (rtl: boolean) => void;
 }
 
-export const AppContext = createContext<AppContextValue | undefined>(undefined);
+export const AppContext = createContext<AppProviderValue | undefined>(undefined);
 
-export function AppContextProvider({
+export function AppProvider({
     children,
     initialLabel = "",
     init,
@@ -50,7 +57,7 @@ export function AppContextProvider({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const value = useMemo<AppContextValue>(() => ({
+    const value = useMemo<AppProviderValue>(() => ({
         label,
         setLabel,
         init: (opts = {}) => navigationInit(opts as any),
@@ -65,12 +72,13 @@ export function AppContextProvider({
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
-export function useAppContext() {
+export function useAppProvider() {
     const ctx = useContext(AppContext);
 
     if (!ctx) {
-        throw new Error("useAppContext must be used within an AppContextProvider");
+        throw new Error("useAppProvider must be used within an AppProvider");
     }
 
     return ctx;
 }
+

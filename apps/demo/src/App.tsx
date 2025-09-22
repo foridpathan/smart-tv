@@ -1,11 +1,9 @@
 
-import { AppContextProvider } from '@smart-tv/ui/AppContext';
-import { Route, RouterProvider } from '@smart-tv/ui/Router';
+import { AppContextProvider, Route, RouterProvider } from '@smart-tv/ui';
 import React from 'react';
 import Home from './home';
-
-const Movie: React.FC = () => <div>Movie</div>;
-const WebSeries: React.FC = () => <div>Web Series</div>;
+import Movie from './movie';
+import WebSeries from './webSeries';
 
 function App() {
   return (
