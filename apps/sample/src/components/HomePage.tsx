@@ -1,32 +1,16 @@
-import React, { useEffect } from 'react';
-import { FocusContext, setFocus, useFocusable } from '../spatial-navigation';
+import { Screen } from '@smart-tv/ui';
+import React from 'react';
+import { useFocusable } from '../spatial-navigation';
 
 const HomePage: React.FC = () => {
-  const { ref, focusKey } = useFocusable({
-    focusKey: 'HOME_PAGE',
-    trackChildren: true,
-    isFocusBoundary: false
-  });
-
-  useEffect(() => {
-    // Set initial focus to the first navigation item
-    const timer = setTimeout(() => {
-      setFocus('NAV_HOME');
-    }, 200);
-    
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
-    <FocusContext.Provider value={focusKey}>
-      <div ref={ref as React.RefObject<HTMLDivElement>} className="tv-container">
-        {/* Side Navigation */}
-        <SideNavigation />
-        
-        {/* Main Content Area */}
-        <MainContent />
-      </div>
-    </FocusContext.Provider>
+    <Screen>
+      <>
+        <h1>Home Page</h1>
+        <p>Welcome to the home page!</p>
+      </>
+    </Screen>
   );
 };
 
@@ -43,8 +27,8 @@ const SideNavigation: React.FC = () => {
   return (
     <nav className="tv-sidebar">
       {navigationItems.map((item) => (
-        <NavigationItem 
-          key={item.id} 
+        <NavigationItem
+          key={item.id}
           item={item}
         />
       ))}
@@ -89,7 +73,7 @@ const MainContent: React.FC = () => {
     <main className="tv-main-content">
       {/* Hero Section */}
       <HeroSection />
-      
+
       {/* Plugin Grid */}
       <PluginGrid />
     </main>
@@ -106,7 +90,7 @@ const HeroSection: React.FC = () => {
   });
 
   return (
-    <section 
+    <section
       ref={ref as React.RefObject<HTMLElement>}
       className={`tv-hero ${focused ? 'tv-hero-focused' : ''}`}
     >
@@ -177,8 +161,8 @@ const PluginCard: React.FC<PluginCardProps> = ({ plugin }) => {
       className={`tv-plugin-card ${focused ? 'tv-plugin-card-focused' : ''}`}
     >
       <div className="tv-plugin-content">
-        <img 
-          src={plugin.logo} 
+        <img
+          src={plugin.logo}
           alt={plugin.name}
           className="tv-plugin-logo"
           onError={(e) => {

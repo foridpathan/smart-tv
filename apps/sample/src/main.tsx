@@ -1,3 +1,4 @@
+import '@smart-tv/ui/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
@@ -44,17 +45,17 @@ if (!window.Promise) {
         }
       }
 
-      this.then = function(onFulfilled, onRejected) {
-        return new Promise(function(resolve, reject) {
+      this.then = function (onFulfilled, onRejected) {
+        return new Promise(function (resolve, reject) {
           handle({
-            onFulfilled: function(result) {
+            onFulfilled: function (result) {
               try {
                 resolve(onFulfilled ? onFulfilled(result) : result);
               } catch (ex) {
                 reject(ex);
               }
             },
-            onRejected: function(error) {
+            onRejected: function (error) {
               try {
                 resolve(onRejected ? onRejected(error) : error);
               } catch (ex) {
@@ -76,7 +77,7 @@ if (!window.Promise) {
 
 // Array.from polyfill
 if (!Array.from) {
-  Array.from = function(arrayLike, mapFn, thisArg) {
+  Array.from = function (arrayLike, mapFn, thisArg) {
     var result = [];
     var length = parseInt(arrayLike.length) || 0;
     for (var i = 0; i < length; i++) {
