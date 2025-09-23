@@ -5,80 +5,86 @@ import App from './App';
 import './index.css';
 
 // Initialize for old Smart TV compatibility
-if (!window.Promise) {
+// Cast window to any for the assignment because the runtime polyfill
+// doesn't include static methods like Promise.resolve/reject/all/race.
+// We only need a minimal polyfill implementation for instances used
+// by the app at runtime on very old Smart TVs.
+if (!(window as any).Promise) {
   // Simple Promise polyfill for very old browsers
-  window.Promise = class Promise {
-    constructor(executor) {
-      let self = this;
-      self.state = 'pending';
-      self.value = undefined;
-      self.handlers = [];
+  // Use a locally-named constructor to avoid colliding with the
+  // TypeScript global `Promise` type during typechecking.
+  const SimplePromise: any = function (executor: any) {
+    const self: any = this;
+    self.state = 'pending';
+    self.value = undefined;
+    self.handlers = [] as any[];
 
-      function resolve(result) {
-        if (self.state === 'pending') {
-          self.state = 'fulfilled';
-          self.value = result;
-          self.handlers.forEach(handle);
-          self.handlers = null;
-        }
-      }
-
-      function reject(error) {
-        if (self.state === 'pending') {
-          self.state = 'rejected';
-          self.value = error;
-          self.handlers.forEach(handle);
-          self.handlers = null;
-        }
-      }
-
-      function handle(handler) {
-        if (self.state === 'pending') {
-          self.handlers.push(handler);
-        } else {
-          if (self.state === 'fulfilled' && typeof handler.onFulfilled === 'function') {
-            handler.onFulfilled(self.value);
-          }
-          if (self.state === 'rejected' && typeof handler.onRejected === 'function') {
-            handler.onRejected(self.value);
-          }
-        }
-      }
-
-      this.then = function (onFulfilled, onRejected) {
-        return new Promise(function (resolve, reject) {
-          handle({
-            onFulfilled: function (result) {
-              try {
-                resolve(onFulfilled ? onFulfilled(result) : result);
-              } catch (ex) {
-                reject(ex);
-              }
-            },
-            onRejected: function (error) {
-              try {
-                resolve(onRejected ? onRejected(error) : error);
-              } catch (ex) {
-                reject(ex);
-              }
-            }
-          });
-        });
-      };
-
-      try {
-        executor(resolve, reject);
-      } catch (ex) {
-        reject(ex);
+    function resolve(result: any) {
+      if (self.state === 'pending') {
+        self.state = 'fulfilled';
+        self.value = result;
+        self.handlers.forEach(handle);
+        self.handlers = null;
       }
     }
+
+    function reject(error: any) {
+      if (self.state === 'pending') {
+        self.state = 'rejected';
+        self.value = error;
+        self.handlers.forEach(handle);
+        self.handlers = null;
+      }
+    }
+
+    function handle(handler: any) {
+      if (self.state === 'pending') {
+        self.handlers.push(handler);
+      } else {
+        if (self.state === 'fulfilled' && typeof handler.onFulfilled === 'function') {
+          handler.onFulfilled(self.value);
+        }
+        if (self.state === 'rejected' && typeof handler.onRejected === 'function') {
+          handler.onRejected(self.value);
+        }
+      }
+    }
+
+    this.then = function (onFulfilled: any, onRejected: any) {
+      return new SimplePromise(function (resolve: any, reject: any) {
+        handle({
+          onFulfilled: function (result: any) {
+            try {
+              resolve(onFulfilled ? onFulfilled(result) : result);
+            } catch (ex) {
+              reject(ex);
+            }
+          },
+          onRejected: function (error: any) {
+            try {
+              resolve(onRejected ? onRejected(error) : error);
+            } catch (ex) {
+              reject(ex);
+            }
+          }
+        });
+      });
+    };
+
+    try {
+      executor(resolve, reject);
+    } catch (ex) {
+      reject(ex);
+    }
   };
+
+  (window as any).Promise = SimplePromise;
 }
 
 // Array.from polyfill
-if (!Array.from) {
-  Array.from = function (arrayLike, mapFn, thisArg) {
-    var result = [];
+if (!(Array as any).from) {
+  (Array as any).from = function (arrayLike: any, mapFn?: any, thisArg?: any) {
+    var result: any[] = [];
     var length = parseInt(arrayLike.length) || 0;
     for (var i = 0; i < length; i++) {
       var value = arrayLike[i];
