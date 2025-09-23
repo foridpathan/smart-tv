@@ -31,7 +31,7 @@ type MenuProps = {
   active?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
-  focus?: boolean;
+  selfFocus?: boolean;
   hover?: boolean;
   href?: string;
   target?: string;
@@ -51,7 +51,7 @@ export function Menu(props: MenuProps) {
     className,
     style,
     disabled,
-    focus,
+    selfFocus,
     active,
     hover,
     href,
@@ -105,10 +105,10 @@ export function Menu(props: MenuProps) {
     },
   });
   React.useEffect(() => {
-    if (focus) {
+    if (selfFocus) {
       focusSelf();
     }
-  }, [focusSelf, focus]);
+  }, [focusSelf, selfFocus]);
 
   const handleClick = () => {
     if (!disabled && typeof onEnterPress === "function") {

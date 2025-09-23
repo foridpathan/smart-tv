@@ -161,6 +161,8 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
+    "@noriginmedia/norigin-spatial-navigation": "^2.3.0",
+    "@smart-tv/navigation": "^0.0.1",
     "core-js": "^3.45.1",
     "lodash": "^4.17.21"
   }

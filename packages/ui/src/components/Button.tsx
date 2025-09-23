@@ -31,7 +31,7 @@ type ButtonProps = {
   active?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
-  isSelfFocus?: boolean;
+  selfFocus?: boolean;
   hover?: boolean;
   data?: any;
 };
@@ -48,7 +48,7 @@ export function Button(props: ButtonProps) {
     className,
     style,
     disabled,
-    isSelfFocus,
+    selfFocus,
     active,
     hover,
     data,
@@ -66,10 +66,10 @@ export function Button(props: ButtonProps) {
     },
   });
   React.useEffect(() => {
-    if (isSelfFocus) {
+    if (selfFocus) {
       focusSelf();
     }
-  }, [focusSelf, isSelfFocus]);
+  }, [focusSelf, selfFocus]);
 
   const handleClick = () => {
     if (!disabled && typeof onEnterPress === "function") {

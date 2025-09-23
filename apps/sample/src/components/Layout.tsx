@@ -9,7 +9,7 @@ export default function Layout({ children }: { children?: ReactNode }) {
           <>
             <div className="font-bold">My TV App</div>
             <nav className="flex flex-col gap-3">
-              <Menu focusKey='Home' focus href='/' className='bg-orange-500 text-white rounded-lg px-4 py-2' active='bg-orange-900' onEnterPress={(e) => console.log(e)}>
+              <Menu focusKey='Home' selfFocus href='/' className='bg-orange-500 text-white rounded-lg px-4 py-2' active='bg-orange-900' onEnterPress={(e) => console.log(e)}>
                 <span>🏠</span>
                 {
                   focused &&

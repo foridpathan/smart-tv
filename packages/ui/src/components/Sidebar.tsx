@@ -109,7 +109,7 @@ export const Sidebar = ({
         ref={containerRef as any}
         tabIndex={0}
         aria-expanded={expanded}
-        className={`ui-flex ui-flex-col ui-h-full ui-bg-surface-2 ui-text-foreground ${className}`}
+        className={`ui-flex ui-flex-col ui-h-full ui-bg-slate-200 ui-text-foreground ${className}`}
         style={{ ...baseStyle, ...overlayStyle }}
       >
         {/* visual thin divider when collapsed */}
