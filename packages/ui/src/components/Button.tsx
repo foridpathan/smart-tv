@@ -66,7 +66,7 @@ export function Button(props: ButtonProps) {
     },
   });
   React.useEffect(() => {
-    if (isSelfFocus || focusKey === "CONTENT") {
+    if (isSelfFocus) {
       focusSelf();
     }
   }, [focusSelf, isSelfFocus]);
@@ -87,7 +87,7 @@ export function Button(props: ButtonProps) {
   return (
     <button
       style={style}
-      className={cn("bg-transparent", className, focused && active, {
+      className={cn("ui-bg-transparent", className, focused && active, {
         focused,
         disabled,
       })}

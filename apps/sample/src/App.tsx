@@ -5,7 +5,7 @@ import Layout from './components/Layout';
 function App() {
   return (
     <div className="tv-main">
-      <AppProvider init={{ debug: true, visualDebug: false }}>
+      <AppProvider init={{}}>
         <RouterProvider>
           <Layout>
             <Route path="/" component={HomePage} />
