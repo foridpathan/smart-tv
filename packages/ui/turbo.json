@@ -2,9 +2,12 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["build:styles", "build:components"]
+      "dependsOn": ["build:styles", "build:components", "build:bundle"]
     },
     "build:styles": {
+      "outputs": ["dist/**"]
+    },
+    "build:bundle": {
       "outputs": ["dist/**"]
     },
     "build:components": {
