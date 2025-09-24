@@ -16,7 +16,7 @@ type RenderProps = {
   focusSelf: () => void;
   ref: React.RefObject<HTMLElement> | null;
   focusKey: string;
-  data?: any;
+  payload?: any;
 };
 
 type ButtonProps = {
@@ -31,9 +31,9 @@ type ButtonProps = {
   active?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
-  selfFocus?: boolean;
+  forceFocus?: boolean;
   hover?: boolean;
-  data?: any;
+  payload?: any;
 };
 
 export function Button(props: ButtonProps) {
@@ -48,10 +48,10 @@ export function Button(props: ButtonProps) {
     className,
     style,
     disabled,
-    selfFocus,
+    forceFocus,
     active,
-    hover,
-    data,
+    hover = false,
+    payload,
   } = props;
   const { ref, focused, focusSelf } = useFocusable({
     onBlur,
@@ -61,22 +61,22 @@ export function Button(props: ButtonProps) {
     onArrowPress,
     focusKey: focusKey,
     extraProps: {
-      ...data,
+      ...payload,
       focusKey,
     },
   });
   React.useEffect(() => {
-    if (selfFocus) {
+    if (forceFocus) {
       focusSelf();
     }
-  }, [focusSelf, selfFocus]);
+  }, [focusSelf, forceFocus]);
 
   const handleClick = () => {
     if (!disabled && typeof onEnterPress === "function") {
       const details: KeyPressDetails = { pressedKeys: { keyCode: 13 } };
       onEnterPress(
         {
-          ...data,
+          ...payload,
           focusKey,
         },
         details
@@ -93,11 +93,11 @@ export function Button(props: ButtonProps) {
       })}
       onClick={handleClick}
       ref={ref}
-      onMouseUp={!hover ? () => { if (!disabled) onEnterRelease?.({ ...data, focusKey }); } : undefined}
-      onMouseEnter={!hover ? () => { if (!disabled) focusSelf(); } : undefined}
+      onMouseUp={hover ? () => { if (!disabled) onEnterRelease?.({ ...payload, focusKey }); } : undefined}
+      onMouseEnter={hover ? () => { if (!disabled) focusSelf(); } : undefined}
       disabled={disabled}>
       {typeof children === "function"
-        ? children({ focused, focusSelf, ref, focusKey, data })
+        ? children({ focused, focusSelf, ref, focusKey, payload })
         : children}
     </button>
   );

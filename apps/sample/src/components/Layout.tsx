@@ -1,5 +1,5 @@
-import { Menu, Sidebar } from '@smart-tv/ui';
-import { ReactNode } from 'react';
+import { Menu, Sidebar, useRouter } from '@smart-tv/ui';
+import { ReactNode, useEffect } from 'react';
 
 const Menus = [
   {
@@ -67,6 +67,13 @@ const Menus = [
 ]
 
 export default function Layout({ children }: { children?: ReactNode }) {
+  const navigate = useRouter();
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => (e.key === 'Backspace') && navigate.back();
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, [])
+
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar collapsedWidth={100} className="bg-[#04101a] bg-opacity-70 text-white">

@@ -95,13 +95,23 @@ export const Sidebar = ({
   useEffect(() => {
     if (overlay) return; // overlay doesn't affect layout
     const width = `${expanded ? expandedWidth : collapsedWidth}px`;
+    const extendedWidth = `${expanded ? 0 : expandedWidth}px`;
+    const collapseWidth = `${expanded ? expandedWidth : 0}px`;
     // set on document.documentElement so layouts outside this component can consume
     const root = document.documentElement as HTMLElement | null;
-    if (root) root.style.setProperty('--ui-sidebar-width', width);
+    if (root) {
+      root.style.setProperty('--ui-sidebar-width', width);
+      root.style.setProperty('--ui-expanded-width', extendedWidth);
+      root.style.setProperty('--ui-collapsed-width', collapseWidth);
+    }
 
     return () => {
       // when unmounting or overlay toggled, remove the variable if it matches
-      if (root) root.style.removeProperty('--ui-sidebar-width');
+      if (root) {
+        root.style.removeProperty('--ui-sidebar-width');
+        root.style.removeProperty('--ui-expanded-width');
+        root.style.removeProperty('--ui-collapsed-width');
+      }
     };
   }, [expanded, expandedWidth, collapsedWidth, overlay]);
 

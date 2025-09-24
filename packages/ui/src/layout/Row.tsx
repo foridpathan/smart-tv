@@ -13,6 +13,11 @@ type RowProps = {
   gap?: number | string;
   trackChildren?: boolean;
   saveLastFocusedChild?: boolean;
+  scrollProps?: {
+    behavior?: ScrollBehavior;
+    block?: ScrollLogicalPosition;
+    inline?: ScrollLogicalPosition;
+  };
 } & Partial<UseFocusableConfig>;
 
 export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
@@ -23,6 +28,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     gap = 0,
     trackChildren = true,
     saveLastFocusedChild = true,
+    scrollProps,
     ...rest
   },
   ref
@@ -69,11 +75,13 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
     requestAnimationFrame(() => {
       if (!targetChild || !scrollContainer) return;
-      targetChild.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "center", // "start" sometimes causes offset issues
-      });
+      targetChild.scrollIntoView(
+        scrollProps || {
+          behavior: "smooth",
+          block: "center",
+          inline: "center", // "start" sometimes causes offset issues
+        }
+      );
     });
   }, []);
   // MutationObserver fallback: many TV nav libraries mark focused item by adding attributes/classes.
@@ -109,10 +117,10 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     <FocusContext.Provider value={providedFocusKey}>
       <div
         ref={containerRef}
-        className="w-screen overflow-x-auto"
+        className="ui-row overflow-x-auto"
         style={{
           WebkitOverflowScrolling: "touch",
-          width: 'calc(100vw - var(--ui-sidebar-width, 0px))'
+          width: 'calc(98vw - var(--ui-sidebar-width, 0px))'
         } as React.CSSProperties}
       >
         <div

@@ -29,9 +29,16 @@ export const Screen = forwardRef<HTMLElement, ScreenProps>(
 
     const Element = Tag as ElementType;
 
+    const style: React.CSSProperties = {
+      marginRight: 'calc(var(--ui-collapsed-width, 0px) * -1)',
+    };
+
     return (
       <FocusContext.Provider value={focusKey}>
-        <Element ref={internalRef as any} className={cn(className)}>{children}</Element>
+        <Element
+          ref={internalRef as any}
+          className={cn('ui-h-screen ui-overflow-hidden', className)}
+          style={style}>{children}</Element>
       </FocusContext.Provider>
     );
   }
