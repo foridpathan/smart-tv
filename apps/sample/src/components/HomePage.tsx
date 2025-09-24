@@ -5,7 +5,7 @@ import { MOVIE } from '../data/movie';
 const HomePage: React.FC = () => {
 
   return (
-    <Screen className='w-[calc(100vw-100px)]'>
+    <Screen>
       <Section className=''>
         <div className="text-white text-3xl font-bold">Welcome to the Home Page</div>
         <Row forceFocus gap={16} className="mt-8">

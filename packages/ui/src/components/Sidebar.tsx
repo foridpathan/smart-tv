@@ -91,6 +91,20 @@ export const Sidebar = ({
     transition: 'width 200ms ease',
   };
 
+  // publish width to a CSS variable so siblings (like Screen) can read it
+  useEffect(() => {
+    if (overlay) return; // overlay doesn't affect layout
+    const width = `${expanded ? expandedWidth : collapsedWidth}px`;
+    // set on document.documentElement so layouts outside this component can consume
+    const root = document.documentElement as HTMLElement | null;
+    if (root) root.style.setProperty('--ui-sidebar-width', width);
+
+    return () => {
+      // when unmounting or overlay toggled, remove the variable if it matches
+      if (root) root.style.removeProperty('--ui-sidebar-width');
+    };
+  }, [expanded, expandedWidth, collapsedWidth, overlay]);
+
   // overlay mode styles
   const overlayStyle: React.CSSProperties = overlay
     ? {

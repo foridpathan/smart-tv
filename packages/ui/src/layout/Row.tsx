@@ -110,7 +110,10 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
       <div
         ref={containerRef}
         className="w-screen overflow-x-auto"
-        style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
+        style={{
+          WebkitOverflowScrolling: "touch",
+          width: 'calc(100vw - var(--ui-sidebar-width, 0px))'
+        } as React.CSSProperties}
       >
         <div
           ref={fRef}
