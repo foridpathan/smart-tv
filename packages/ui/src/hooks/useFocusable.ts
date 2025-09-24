@@ -14,36 +14,36 @@ import {
   FocusDetails,
   KeyPressDetails,
   SmartTvNavigation,
-} from "../core";
+} from "../core/Navigation";
 import { useFocusContext } from "./useFocusContext";
 
 export type EnterPressHandler<P = object> = (
-  props: P | undefined,
+  props: P,
   details: KeyPressDetails
 ) => void;
 
-export type EnterReleaseHandler<P = object> = (props: P | undefined) => void;
+export type EnterReleaseHandler<P = object> = (props: P) => void;
 
 export type ArrowPressHandler<P = object> = (
   direction: string,
-  props: P | undefined,
+  props: P,
   details: KeyPressDetails
 ) => boolean;
 
 export type ArrowReleaseHandler<P = object> = (
   direction: string,
-  props: P | undefined
+  props: P
 ) => void;
 
 export type FocusHandler<P = object> = (
   layout: FocusableComponentLayout,
-  props: P | undefined,
+  props: P,
   details: FocusDetails
 ) => void;
 
 export type BlurHandler<P = object> = (
   layout: FocusableComponentLayout,
-  props: P | undefined,
+  props: P,
   details: FocusDetails
 ) => void;
 
@@ -93,8 +93,8 @@ const useFocusableHook = <P>({
   extraProps,
 }: UseFocusableConfig<P> = {}): UseFocusableResult => {
   const onEnterPressHandler = useCallback(
-    (details?: KeyPressDetails) => {
-      onEnterPress(extraProps, details || { pressedKeys: {} });
+    (details: KeyPressDetails) => {
+      onEnterPress(extraProps, details);
     },
     [onEnterPress, extraProps]
   );
@@ -104,8 +104,8 @@ const useFocusableHook = <P>({
   }, [onEnterRelease, extraProps]);
 
   const onArrowPressHandler = useCallback(
-    (direction: string, details?: KeyPressDetails) =>
-      onArrowPress(direction, extraProps, details || { pressedKeys: {} }),
+    (direction: string, details: KeyPressDetails) =>
+      onArrowPress(direction, extraProps, details),
     [extraProps, onArrowPress]
   );
 
@@ -117,15 +117,15 @@ const useFocusableHook = <P>({
   );
 
   const onFocusHandler = useCallback(
-    (layout: FocusableComponentLayout, details?: FocusDetails) => {
-      onFocus(layout, extraProps, details || {});
+    (layout: FocusableComponentLayout, details: FocusDetails) => {
+      onFocus(layout, extraProps, details);
     },
     [extraProps, onFocus]
   );
 
   const onBlurHandler = useCallback(
-    (layout: FocusableComponentLayout, details?: FocusDetails) => {
-      onBlur(layout, extraProps, details || {});
+    (layout: FocusableComponentLayout, details: FocusDetails) => {
+      onBlur(layout, extraProps, details);
     },
     [extraProps, onBlur]
   );
@@ -157,8 +157,7 @@ const useFocusableHook = <P>({
 
     SmartTvNavigation.addFocusable({
       focusKey,
-      // SmartTvNavigation expects a non-null HTMLElement; ref.current can be null during SSR
-      node: node as unknown as HTMLElement,
+      node,
       parentFocusKey,
       preferredChildFocusKey,
       onEnterPress: onEnterPressHandler,
@@ -190,7 +189,7 @@ const useFocusableHook = <P>({
     const node = ref.current;
 
     SmartTvNavigation.updateFocusable(focusKey, {
-      node: node as unknown as HTMLElement,
+      node,
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,

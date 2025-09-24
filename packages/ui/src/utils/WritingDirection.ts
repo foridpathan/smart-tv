@@ -1,4 +1,6 @@
-export enum WritingDirection {
+enum WritingDirection {
   LTR,
   RTL
 }
+
+export default WritingDirection;

@@ -1,29 +1,26 @@
-import { DebouncedFunc } from "lodash";
-import debounce from "lodash/debounce";
-import difference from "lodash/difference";
-import filter from "lodash/filter";
-import findKey from "lodash/findKey";
-import first from "lodash/first";
-import forEach from "lodash/forEach";
-import forOwn from "lodash/forOwn";
-import sortBy from "lodash/sortBy";
-import throttle from "lodash/throttle";
-import {
-  getBoundingClientRect,
-  measureLayout,
-  VisualDebugger,
-  WritingDirection,
-} from "../utils";
+import { DebouncedFunc } from 'lodash';
+import debounce from 'lodash/debounce';
+import difference from 'lodash/difference';
+import filter from 'lodash/filter';
+import findKey from 'lodash/findKey';
+import first from 'lodash/first';
+import forEach from 'lodash/forEach';
+import forOwn from 'lodash/forOwn';
+import sortBy from 'lodash/sortBy';
+import throttle from 'lodash/throttle';
+import VisualDebugger from '../utils/VisualDebugger';
+import WritingDirection from '../utils/WritingDirection';
+import measureLayout, { getBoundingClientRect } from '../utils/measureLayout';
 
-const DIRECTION_LEFT = "left";
-const DIRECTION_RIGHT = "right";
-const DIRECTION_UP = "up";
-const DIRECTION_DOWN = "down";
-const KEY_ENTER = "enter";
+const DIRECTION_LEFT = 'left';
+const DIRECTION_RIGHT = 'right';
+const DIRECTION_UP = 'up';
+const DIRECTION_DOWN = 'down';
+const KEY_ENTER = 'enter';
 
-export type Direction = "up" | "down" | "left" | "right";
+export type Direction = 'up' | 'down' | 'left' | 'right';
 
-type DistanceCalculationMethod = "center" | "edges" | "corners";
+type DistanceCalculationMethod = 'center' | 'edges' | 'corners';
 
 type DistanceCalculationFunction = (
   refCorners: Corners,
@@ -33,14 +30,14 @@ type DistanceCalculationFunction = (
 ) => number;
 
 const DEFAULT_KEY_MAP = {
-  [DIRECTION_LEFT]: [37, "ArrowLeft"],
-  [DIRECTION_UP]: [38, "ArrowUp"],
-  [DIRECTION_RIGHT]: [39, "ArrowRight"],
-  [DIRECTION_DOWN]: [40, "ArrowDown"],
-  [KEY_ENTER]: [13, "Enter"],
+  [DIRECTION_LEFT]: [37, 'ArrowLeft'],
+  [DIRECTION_UP]: [38, 'ArrowUp'],
+  [DIRECTION_RIGHT]: [39, 'ArrowRight'],
+  [DIRECTION_DOWN]: [40, 'ArrowDown'],
+  [KEY_ENTER]: [13, 'Enter']
 };
 
-export const ROOT_FOCUS_KEY = "SN:ROOT";
+export const ROOT_FOCUS_KEY = 'SN:ROOT';
 
 const ADJACENT_SLICE_THRESHOLD = 0.2;
 
@@ -57,11 +54,11 @@ const MAIN_COORDINATE_WEIGHT = 5;
 
 const AUTO_RESTORE_FOCUS_DELAY = 300;
 
-const DEBUG_FN_COLORS = ["#0FF", "#FF0", "#F0F"];
+const DEBUG_FN_COLORS = ['#0FF', '#FF0', '#F0F'];
 
 const THROTTLE_OPTIONS = {
   leading: true,
-  trailing: false,
+  trailing: false
 };
 
 export interface FocusableComponentLayout {
@@ -160,13 +157,9 @@ const getChildClosestToOrigin = (
   const comparator =
     writingDirection === WritingDirection.LTR
       ? ({ layout }: FocusableComponent) =>
-          layout
-            ? Math.abs(layout.left) + Math.abs(layout.top)
-            : Number.POSITIVE_INFINITY
+          Math.abs(layout.left) + Math.abs(layout.top)
       : ({ layout }: FocusableComponent) =>
-          layout
-            ? Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top)
-            : Number.POSITIVE_INFINITY;
+          Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
 
   const childrenClosestToOrigin = sortBy(children, comparator);
 
@@ -190,12 +183,12 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
 class SmartTvNavigationService {
   private focusableComponents: { [index: string]: FocusableComponent };
 
-  private visualDebugger: VisualDebugger | null;
+  private visualDebugger: VisualDebugger;
 
   /**
    * Focus key of the currently focused element
    */
-  private focusKey: string | null;
+  private focusKey: string;
 
   private shouldFocusDOMNode: boolean;
 
@@ -246,13 +239,13 @@ class SmartTvNavigationService {
    */
   private useGetBoundingClientRect: boolean;
 
-  private keyDownEventListener?: (event: KeyboardEvent) => void;
+  private keyDownEventListener: (event: KeyboardEvent) => void;
 
-  private keyDownEventListenerThrottled?: DebouncedFunc<
+  private keyDownEventListenerThrottled: DebouncedFunc<
     (event: KeyboardEvent) => void
-  >;
+  > | undefined;
 
-  private keyUpEventListener?: (event: KeyboardEvent) => void;
+  private keyUpEventListener: (event: KeyboardEvent) => void;
 
   private keyMap: KeyMap;
 
@@ -281,22 +274,22 @@ class SmartTvNavigationService {
     const itemStart = isVertical
       ? layout.top
       : writingDirection === WritingDirection.LTR
-        ? layout.left
-        : layout.right;
+      ? layout.left
+      : layout.right;
 
     const itemEnd = isVertical
       ? layout.bottom
       : writingDirection === WritingDirection.LTR
-        ? layout.right
-        : layout.left;
+      ? layout.right
+      : layout.left;
 
     return isIncremental
       ? isSibling
         ? itemStart
         : itemEnd
       : isSibling
-        ? itemEnd
-        : itemStart;
+      ? itemEnd
+      : itemStart;
   }
 
   /**
@@ -311,12 +304,12 @@ class SmartTvNavigationService {
     const result = {
       a: {
         x: 0,
-        y: 0,
+        y: 0
       },
       b: {
         x: 0,
-        y: 0,
-      },
+        y: 0
+      }
     };
 
     switch (direction) {
@@ -325,12 +318,12 @@ class SmartTvNavigationService {
 
         result.a = {
           x: layout.left,
-          y,
+          y
         };
 
         result.b = {
           x: layout.right,
-          y,
+          y
         };
 
         break;
@@ -341,12 +334,12 @@ class SmartTvNavigationService {
 
         result.a = {
           x: layout.left,
-          y,
+          y
         };
 
         result.b = {
           x: layout.right,
-          y,
+          y
         };
 
         break;
@@ -357,12 +350,12 @@ class SmartTvNavigationService {
 
         result.a = {
           x,
-          y: layout.top,
+          y: layout.top
         };
 
         result.b = {
           x,
-          y: layout.bottom,
+          y: layout.bottom
         };
 
         break;
@@ -373,12 +366,12 @@ class SmartTvNavigationService {
 
         result.a = {
           x,
-          y: layout.top,
+          y: layout.top
         };
 
         result.b = {
           x,
-          y: layout.bottom,
+          y: layout.bottom
         };
 
         break;
@@ -401,7 +394,7 @@ class SmartTvNavigationService {
   ) {
     const { a: refA, b: refB } = refCorners;
     const { a: siblingA, b: siblingB } = siblingCorners;
-    const coordinate = isVerticalDirection ? "x" : "y";
+    const coordinate = isVerticalDirection ? 'x' : 'y';
 
     const refCoordinateA = refA[coordinate];
     const refCoordinateB = refB[coordinate];
@@ -427,7 +420,7 @@ class SmartTvNavigationService {
   ) {
     const { a: refA } = refCorners;
     const { a: siblingA } = siblingCorners;
-    const coordinate = isVerticalDirection ? "y" : "x";
+    const coordinate = isVerticalDirection ? 'y' : 'x';
 
     return Math.abs(siblingA[coordinate] - refA[coordinate]);
   }
@@ -450,20 +443,20 @@ class SmartTvNavigationService {
 
     const { a: refA, b: refB } = refCorners;
     const { a: siblingA, b: siblingB } = siblingCorners;
-    const coordinate = isVerticalDirection ? "x" : "y";
+    const coordinate = isVerticalDirection ? 'x' : 'y';
 
     const refCoordinateA = refA[coordinate];
     const refCoordinateB = refB[coordinate];
     const siblingCoordinateA = siblingA[coordinate];
     const siblingCoordinateB = siblingB[coordinate];
 
-    if (distanceCalculationMethod === "center") {
+    if (distanceCalculationMethod === 'center') {
       const refCoordinateCenter = (refCoordinateA + refCoordinateB) / 2;
       const siblingCoordinateCenter =
         (siblingCoordinateA + siblingCoordinateB) / 2;
       return Math.abs(refCoordinateCenter - siblingCoordinateCenter);
     }
-    if (distanceCalculationMethod === "edges") {
+    if (distanceCalculationMethod === 'edges') {
       // 1. Find the minimum and maximum coordinates for both ref and sibling
       const refCoordinateEdgeMin = Math.min(refCoordinateA, refCoordinateB);
       const siblingCoordinateEdgeMin = Math.min(
@@ -493,7 +486,7 @@ class SmartTvNavigationService {
       Math.abs(siblingCoordinateA - refCoordinateA),
       Math.abs(siblingCoordinateA - refCoordinateB),
       Math.abs(siblingCoordinateB - refCoordinateA),
-      Math.abs(siblingCoordinateB - refCoordinateB),
+      Math.abs(siblingCoordinateB - refCoordinateB)
     ];
     return Math.min(...distancesToCompare);
   }
@@ -519,7 +512,6 @@ class SmartTvNavigationService {
     );
 
     return sortBy(siblings, (sibling) => {
-      if (!sibling.layout) return Number.POSITIVE_INFINITY;
       const siblingCorners = SmartTvNavigationService.getRefCorners(
         direction,
         true,
@@ -569,7 +561,7 @@ class SmartTvNavigationService {
         (isAdjacentSlice ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
 
       this.log(
-        "smartNavigate",
+        'smartNavigate',
         `distance (primary, secondary, total weighted) for ${sibling.focusKey} relative to ${focusKey} is`,
         primaryAxisDistance,
         secondaryAxisDistance,
@@ -577,7 +569,7 @@ class SmartTvNavigationService {
       );
 
       this.log(
-        "smartNavigate",
+        'smartNavigate',
         `priority for ${sibling.focusKey} relative to ${focusKey} is`,
         priority
       );
@@ -586,13 +578,13 @@ class SmartTvNavigationService {
         this.visualDebugger.drawPoint(
           siblingCorners.a.x,
           siblingCorners.a.y,
-          "yellow",
+          'yellow',
           6
         );
         this.visualDebugger.drawPoint(
           siblingCorners.b.x,
           siblingCorners.b.y,
-          "yellow",
+          'yellow',
           6
         );
       }
@@ -636,8 +628,8 @@ class SmartTvNavigationService {
      */
     this.paused = false;
 
-    this.keyDownEventListener = undefined;
-    this.keyUpEventListener = undefined;
+    this.keyDownEventListener = null;
+    this.keyUpEventListener = null;
     this.keyMap = DEFAULT_KEY_MAP;
 
     this.pause = this.pause.bind(this);
@@ -655,7 +647,7 @@ class SmartTvNavigationService {
 
     this.setFocusDebounced = debounce(this.setFocus, AUTO_RESTORE_FOCUS_DELAY, {
       leading: false,
-      trailing: true,
+      trailing: true
     });
 
     this.debug = false;
@@ -663,7 +655,7 @@ class SmartTvNavigationService {
 
     this.logIndex = 0;
 
-    this.distanceCalculationMethod = "corners";
+    this.distanceCalculationMethod = 'corners';
   }
 
   init({
@@ -677,8 +669,8 @@ class SmartTvNavigationService {
     domNodeFocusOptions = {},
     shouldUseNativeEvents = false,
     rtl = false,
-    distanceCalculationMethod = "corners" as DistanceCalculationMethod,
-    customDistanceCalculationFunction = undefined,
+    distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
+    customDistanceCalculationFunction = undefined as DistanceCalculationFunction
   } = {}) {
     if (!this.enabled) {
       this.domNodeFocusOptions = domNodeFocusOptions;
@@ -704,17 +696,13 @@ class SmartTvNavigationService {
           this.visualDebugger = new VisualDebugger(this.writingDirection);
           const draw = () => {
             requestAnimationFrame(() => {
-              if (this.visualDebugger) {
-                this.visualDebugger.clearLayouts();
-              }
+              this.visualDebugger.clearLayouts();
               forOwn(this.focusableComponents, (component, focusKey) => {
-                if (component.layout && this.visualDebugger) {
-                  this.visualDebugger.drawLayout(
-                    component.layout,
-                    focusKey,
-                    component.parentFocusKey
-                  );
-                }
+                this.visualDebugger.drawLayout(
+                  component.layout,
+                  focusKey,
+                  component.parentFocusKey
+                );
               });
               draw();
             });
@@ -728,7 +716,7 @@ class SmartTvNavigationService {
 
   setThrottle({
     throttle: throttleParam = 0,
-    throttleKeypresses = false,
+    throttleKeypresses = false
   } = {}) {
     this.throttleKeypresses = throttleKeypresses;
 
@@ -767,7 +755,7 @@ class SmartTvNavigationService {
 
   bindEventHandlers() {
     // We check both because the React Native remote debugger implements window, but not window.addEventListener.
-    if (typeof window !== "undefined" && window.addEventListener) {
+    if (typeof window !== 'undefined' && window.addEventListener) {
       this.keyDownEventListener = (event: KeyboardEvent) => {
         if (this.paused === true) {
           return;
@@ -794,7 +782,7 @@ class SmartTvNavigationService {
         }
 
         const keysDetails = {
-          pressedKeys: this.pressedKeys,
+          pressedKeys: this.pressedKeys
         };
 
         if (eventType === KEY_ENTER && this.focusKey) {
@@ -811,7 +799,7 @@ class SmartTvNavigationService {
         }
 
         if (preventDefaultNavigation) {
-          this.log("keyDownEventListener", "default navigation prevented");
+          this.log('keyDownEventListener', 'default navigation prevented');
         } else {
           const direction = findKey(this.getKeyMap(), (codeList) =>
             codeList.includes(keyCode)
@@ -835,72 +823,63 @@ class SmartTvNavigationService {
         const keyCode = SmartTvNavigationService.getKeyCode(event);
         const eventType = this.getEventType(keyCode);
 
-        if (eventType !== undefined) {
-          delete this.pressedKeys[eventType];
-        }
+        delete this.pressedKeys[eventType];
 
         if (this.throttle && !this.throttleKeypresses) {
-          this.keyDownEventListenerThrottled?.cancel();
+          this.keyDownEventListenerThrottled.cancel();
         }
 
         if (eventType === KEY_ENTER && this.focusKey) {
           this.onEnterRelease();
         }
 
-        if (
-          this.focusKey &&
-          (eventType === DIRECTION_LEFT ||
-            eventType === DIRECTION_RIGHT ||
-            eventType === DIRECTION_UP ||
-            eventType === DIRECTION_DOWN)
-        ) {
-          this.onArrowRelease(eventType);
+        if (this.focusKey && (
+          eventType === DIRECTION_LEFT ||
+          eventType === DIRECTION_RIGHT ||
+          eventType === DIRECTION_UP ||
+          eventType === DIRECTION_DOWN)) {
+          this.onArrowRelease(eventType)
         }
       };
 
-      window.addEventListener("keyup", this.keyUpEventListener);
-      const keyDownListener = this.throttle
-        ? this.keyDownEventListenerThrottled
-        : this.keyDownEventListener;
-
-      if (keyDownListener) {
-        window.addEventListener("keydown", keyDownListener as EventListener);
-      }
+      window.addEventListener('keyup', this.keyUpEventListener);
+      window.addEventListener(
+        'keydown',
+        this.throttle
+          ? this.keyDownEventListenerThrottled
+          : this.keyDownEventListener
+      );
     }
   }
 
   unbindEventHandlers() {
     // We check both because the React Native remote debugger implements window, but not window.removeEventListener.
-    if (typeof window !== "undefined" && window.removeEventListener) {
-      if (this.keyUpEventListener) {
-        window.removeEventListener("keyup", this.keyUpEventListener);
-        this.keyUpEventListener = undefined;
-      }
+    if (typeof window !== 'undefined' && window.removeEventListener) {
+      window.removeEventListener('keyup', this.keyUpEventListener);
+      this.keyUpEventListener = null;
 
       const listener = this.throttle
         ? this.keyDownEventListenerThrottled
         : this.keyDownEventListener;
 
-      if (listener) {
-        window.removeEventListener("keydown", listener);
-      }
-      this.keyDownEventListener = undefined;
+      window.removeEventListener('keydown', listener);
+      this.keyDownEventListener = null;
     }
   }
 
   onEnterPress(keysDetails: KeyPressDetails) {
-    const component = this.focusKey ? this.focusableComponents[this.focusKey] : undefined;
+    const component = this.focusableComponents[this.focusKey];
 
     /* Guard against last-focused component being unmounted at time of onEnterPress (e.g due to UI fading out) */
     if (!component) {
-      this.log("onEnterPress", "noComponent");
+      this.log('onEnterPress', 'noComponent');
 
       return;
     }
 
     /* Suppress onEnterPress if the last-focused item happens to lose its 'focused' status. */
     if (!component.focusable) {
-      this.log("onEnterPress", "componentNotFocusable");
+      this.log('onEnterPress', 'componentNotFocusable');
 
       return;
     }
@@ -911,18 +890,18 @@ class SmartTvNavigationService {
   }
 
   onEnterRelease() {
-    const component = this.focusKey ? this.focusableComponents[this.focusKey] : undefined;
+    const component = this.focusableComponents[this.focusKey];
 
     /* Guard against last-focused component being unmounted at time of onEnterRelease (e.g due to UI fading out) */
     if (!component) {
-      this.log("onEnterRelease", "noComponent");
+      this.log('onEnterRelease', 'noComponent');
 
       return;
     }
 
     /* Suppress onEnterRelease if the last-focused item happens to lose its 'focused' status. */
     if (!component.focusable) {
-      this.log("onEnterRelease", "componentNotFocusable");
+      this.log('onEnterRelease', 'componentNotFocusable');
 
       return;
     }
@@ -933,11 +912,11 @@ class SmartTvNavigationService {
   }
 
   onArrowPress(direction: string, keysDetails: KeyPressDetails) {
-    const component = this.focusKey ? this.focusableComponents[this.focusKey] : undefined;
+    const component = this.focusableComponents[this.focusKey];
 
     /* Guard against last-focused component being unmounted at time of onArrowPress (e.g due to UI fading out) */
     if (!component) {
-      this.log("onArrowPress", "noComponent");
+      this.log('onArrowPress', 'noComponent');
 
       return undefined;
     }
@@ -953,18 +932,18 @@ class SmartTvNavigationService {
   }
 
   onArrowRelease(direction: string) {
-    const component = this.focusKey ? this.focusableComponents[this.focusKey] : undefined;
+    const component = this.focusableComponents[this.focusKey];
 
     /* Guard against last-focused component being unmounted at time of onArrowRelease (e.g due to UI fading out) */
     if (!component) {
-      this.log("onArrowRelease", "noComponent");
+      this.log('onArrowRelease', 'noComponent');
 
       return;
     }
 
     /* Suppress onArrowRelease if the last-focused item happens to lose its 'focused' status. */
     if (!component.focusable) {
-      this.log("onArrowRelease", "componentNotFocusable");
+      this.log('onArrowRelease', 'componentNotFocusable');
 
       return;
     }
@@ -989,15 +968,15 @@ class SmartTvNavigationService {
       DIRECTION_DOWN,
       DIRECTION_UP,
       DIRECTION_LEFT,
-      DIRECTION_RIGHT,
+      DIRECTION_RIGHT
     ];
 
     if (validDirections.includes(direction)) {
-      this.log("navigateByDirection", "direction", direction);
+      this.log('navigateByDirection', 'direction', direction);
       this.smartNavigate(direction, null, focusDetails);
     } else {
       this.log(
-        "navigateByDirection",
+        'navigateByDirection',
         `Invalid direction. You passed: \`${direction}\`, but you can use only these: `,
         validDirections
       );
@@ -1009,8 +988,8 @@ class SmartTvNavigationService {
    * Based on the Direction
    */
   smartNavigate(
-    direction: string | undefined,
-    fromParentFocusKey: string | null,
+    direction: string,
+    fromParentFocusKey: string,
     focusDetails: FocusDetails
   ) {
     if (this.nativeMode) {
@@ -1025,9 +1004,9 @@ class SmartTvNavigationService {
         ? direction === DIRECTION_RIGHT
         : direction === DIRECTION_LEFT);
 
-    this.log("smartNavigate", "direction", direction);
-    this.log("smartNavigate", "fromParentFocusKey", fromParentFocusKey);
-    this.log("smartNavigate", "this.focusKey", this.focusKey);
+    this.log('smartNavigate', 'direction', direction);
+    this.log('smartNavigate', 'fromParentFocusKey', fromParentFocusKey);
+    this.log('smartNavigate', 'this.focusKey', this.focusKey);
 
     if (!fromParentFocusKey) {
       forOwn(this.focusableComponents, (component) => {
@@ -1036,22 +1015,21 @@ class SmartTvNavigationService {
       });
     }
 
-    const currentFocusKey = fromParentFocusKey ?? this.focusKey;
     const currentComponent =
-      currentFocusKey ? this.focusableComponents[currentFocusKey] : undefined;
+      this.focusableComponents[fromParentFocusKey || this.focusKey];
 
     /**
      * When there's no currently focused component, an attempt is made, to force focus one of
      * the Focusable Containers, that have "forceFocus" flag enabled.
      */
     if (!fromParentFocusKey && !currentComponent) {
-      this.setFocus(this.getForcedFocusKey() ?? ROOT_FOCUS_KEY);
+      this.setFocus(this.getForcedFocusKey());
       return;
     }
 
     this.log(
-      "smartNavigate",
-      "currentComponent",
+      'smartNavigate',
+      'currentComponent',
       currentComponent ? currentComponent.focusKey : undefined,
       currentComponent ? currentComponent.node : undefined,
       currentComponent
@@ -1061,20 +1039,14 @@ class SmartTvNavigationService {
       this.updateLayout(currentComponent.focusKey);
       const { parentFocusKey, focusKey, layout } = currentComponent;
 
-      let currentCutoffCoordinate: number | undefined = undefined;
-      if (layout) {
-        currentCutoffCoordinate = SmartTvNavigationService.getCutoffCoordinate(
+      const currentCutoffCoordinate =
+        SmartTvNavigationService.getCutoffCoordinate(
           isVerticalDirection,
           isIncrementalDirection,
           false,
           layout,
           this.writingDirection
         );
-      } else {
-        // If layout is undefined, skip navigation logic or handle accordingly
-        this.log("smartNavigate", "currentComponent.layout is undefined, cannot calculate cutoff coordinate");
-        return;
-      }
 
       /**
        * Get only the siblings with the coords on the way of our moving direction
@@ -1082,8 +1054,7 @@ class SmartTvNavigationService {
       const siblings = filter(this.focusableComponents, (component) => {
         if (
           component.parentFocusKey === parentFocusKey &&
-          component.focusable &&
-          component.layout // Ensure layout is defined
+          component.focusable
         ) {
           this.updateLayout(component.focusKey);
           const siblingCutoffCoordinate =
@@ -1100,12 +1071,12 @@ class SmartTvNavigationService {
               ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
               : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
             : this.writingDirection === WritingDirection.LTR
-              ? isIncrementalDirection
-                ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
-                : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
-              : isIncrementalDirection
-                ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
-                : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
+            ? isIncrementalDirection
+              ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
+              : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
+            : isIncrementalDirection
+            ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
+            : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
         }
 
         return false;
@@ -1113,46 +1084,43 @@ class SmartTvNavigationService {
 
       if (this.debug) {
         this.log(
-          "smartNavigate",
-          "currentCutoffCoordinate",
+          'smartNavigate',
+          'currentCutoffCoordinate',
           currentCutoffCoordinate
         );
         this.log(
-          "smartNavigate",
-          "siblings",
+          'smartNavigate',
+          'siblings',
           `${siblings.length} elements:`,
-          siblings.map((sibling) => sibling.focusKey).join(", "),
+          siblings.map((sibling) => sibling.focusKey).join(', '),
           siblings.map((sibling) => sibling.node),
           siblings.map((sibling) => sibling)
         );
       }
 
-      if (this.visualDebugger && layout) {
-        if (typeof direction === "string") {
-          const refCorners = SmartTvNavigationService.getRefCorners(
-            direction,
-            false,
-            layout
-          );
-          this.visualDebugger.drawPoint(refCorners.a.x, refCorners.a.y);
-          this.visualDebugger.drawPoint(refCorners.b.x, refCorners.b.y);
-        }
+      if (this.visualDebugger) {
+        const refCorners = SmartTvNavigationService.getRefCorners(
+          direction,
+          false,
+          layout
+        );
+
+        this.visualDebugger.drawPoint(refCorners.a.x, refCorners.a.y);
+        this.visualDebugger.drawPoint(refCorners.b.x, refCorners.b.y);
       }
 
-      const sortedSiblings = typeof direction === "string"
-        ? this.sortSiblingsByPriority(
-            siblings,
-            layout,
-            direction,
-            focusKey
-          )
-        : [];
+      const sortedSiblings = this.sortSiblingsByPriority(
+        siblings,
+        layout,
+        direction,
+        focusKey
+      );
 
       const nextComponent = first(sortedSiblings);
 
       this.log(
-        "smartNavigate",
-        "nextComponent",
+        'smartNavigate',
+        'nextComponent',
         nextComponent ? nextComponent.focusKey : undefined,
         nextComponent ? nextComponent.node : undefined,
         nextComponent
@@ -1177,7 +1145,7 @@ class SmartTvNavigationService {
   saveLastFocusedChildKey(component: FocusableComponent, focusKey: string) {
     if (component) {
       this.log(
-        "saveLastFocusedChildKey",
+        'saveLastFocusedChildKey',
         `${component.focusKey} lastFocusedChildKey set`,
         focusKey
       );
@@ -1195,7 +1163,7 @@ class SmartTvNavigationService {
         `background: ${
           DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
         }; color: black; padding: 1px 5px;`,
-        "background: #333; color: #BADA55; padding: 1px 5px;",
+        'background: #333; color: #BADA55; padding: 1px 5px;',
         ...rest
       );
     }
@@ -1205,7 +1173,7 @@ class SmartTvNavigationService {
    * Returns the current focus key
    */
   getCurrentFocusKey(): string {
-    return this.focusKey ?? "";
+    return this.focusKey;
   }
 
   /**
@@ -1233,9 +1201,9 @@ class SmartTvNavigationService {
         top: 0,
         right: 0,
         bottom: 0,
-        node: document.body,
+        node: null
       },
-      "down",
+      'down',
       ROOT_FOCUS_KEY
     );
 
@@ -1267,13 +1235,13 @@ class SmartTvNavigationService {
       const { lastFocusedChildKey, preferredChildFocusKey } = targetComponent;
 
       this.log(
-        "getNextFocusKey",
-        "lastFocusedChildKey is",
+        'getNextFocusKey',
+        'lastFocusedChildKey is',
         lastFocusedChildKey
       );
       this.log(
-        "getNextFocusKey",
-        "preferredChildFocusKey is",
+        'getNextFocusKey',
+        'preferredChildFocusKey is',
         preferredChildFocusKey
       );
 
@@ -1286,8 +1254,8 @@ class SmartTvNavigationService {
         this.isParticipatingFocusableComponent(lastFocusedChildKey)
       ) {
         this.log(
-          "getNextFocusKey",
-          "lastFocusedChildKey will be focused",
+          'getNextFocusKey',
+          'lastFocusedChildKey will be focused',
           lastFocusedChildKey
         );
 
@@ -1302,8 +1270,8 @@ class SmartTvNavigationService {
         this.isParticipatingFocusableComponent(preferredChildFocusKey)
       ) {
         this.log(
-          "getNextFocusKey",
-          "preferredChildFocusKey will be focused",
+          'getNextFocusKey',
+          'preferredChildFocusKey will be focused',
           preferredChildFocusKey
         );
 
@@ -1314,24 +1282,20 @@ class SmartTvNavigationService {
        * Otherwise, trying to focus something by coordinates
        */
       children.forEach((component) => this.updateLayout(component.focusKey));
-      const childClosest = getChildClosestToOrigin(
+      const { focusKey: childKey } = getChildClosestToOrigin(
         children,
         this.writingDirection
       );
-      if (childClosest && childClosest.focusKey) {
-        this.log(
-          "getNextFocusKey",
-          "childKey will be focused",
-          childClosest.focusKey
-        );
-        return this.getNextFocusKey(childClosest.focusKey);
-      }
+
+      this.log('getNextFocusKey', 'childKey will be focused', childKey);
+
+      return this.getNextFocusKey(childKey);
     }
 
     /**
      * If no children, just return targetFocusKey back
      */
-    this.log("getNextFocusKey", "targetFocusKey", targetFocusKey);
+    this.log('getNextFocusKey', 'targetFocusKey', targetFocusKey);
 
     return targetFocusKey;
   }
@@ -1355,7 +1319,7 @@ class SmartTvNavigationService {
     forceFocus,
     focusable,
     isFocusBoundary,
-    focusBoundaryDirections,
+    focusBoundaryDirections
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1377,7 +1341,7 @@ class SmartTvNavigationService {
       focusBoundaryDirections,
       autoRestoreFocus,
       forceFocus,
-      lastFocusedChildKey: undefined,
+      lastFocusedChildKey: null,
       layout: {
         x: 0,
         y: 0,
@@ -1391,9 +1355,9 @@ class SmartTvNavigationService {
         /**
          * Node ref is also duplicated in layout to be reported in onFocus callback
          */
-        node,
+        node
       },
-      layoutUpdated: false,
+      layoutUpdated: false
     };
 
     if (!node) {
@@ -1411,8 +1375,8 @@ class SmartTvNavigationService {
     this.updateLayout(focusKey);
 
     this.log(
-      "addFocusable",
-      "Component added: ",
+      'addFocusable',
+      'Component added: ',
       this.focusableComponents[focusKey]
     );
 
@@ -1427,15 +1391,11 @@ class SmartTvNavigationService {
      * Parent nodes are created after children, and child may focus itself.
      * If so, it's required to check if parent lies on a path to focused child.
      */
-    let currentComponent = this.focusKey ? this.focusableComponents[this.focusKey] : undefined;
+    let currentComponent = this.focusableComponents[this.focusKey];
     while (currentComponent) {
       if (currentComponent.parentFocusKey === focusKey) {
-        if (this.focusKey) {
-          this.updateParentsHasFocusedChild(this.focusKey, {});
-        }
-        if (this.focusKey !== null) {
-          this.updateParentsLastFocusedChild(this.focusKey);
-        }
+        this.updateParentsHasFocusedChild(this.focusKey, {});
+        this.updateParentsLastFocusedChild(this.focusKey);
         break;
       }
       currentComponent =
@@ -1451,7 +1411,7 @@ class SmartTvNavigationService {
 
       onUpdateFocus(false);
 
-      this.log("removeFocusable", "Component removed: ", componentToRemove);
+      this.log('removeFocusable', 'Component removed: ', componentToRemove);
 
       delete this.focusableComponents[focusKey];
 
@@ -1467,7 +1427,7 @@ class SmartTvNavigationService {
        * If the component was stored as lastFocusedChild, clear lastFocusedChildKey from parent
        */
       if (parentComponent && parentComponent.lastFocusedChildKey === focusKey) {
-        parentComponent.lastFocusedChildKey = undefined;
+        parentComponent.lastFocusedChildKey = null;
       }
 
       if (this.nativeMode) {
@@ -1485,10 +1445,10 @@ class SmartTvNavigationService {
         parentComponent.autoRestoreFocus
       ) {
         this.log(
-          "removeFocusable",
-          "Component removed: ",
-          isFocused ? "Leaf component" : "Container component",
-          "Auto restoring focus to: ",
+          'removeFocusable',
+          'Component removed: ',
+          isFocused ? 'Leaf component' : 'Container component',
+          'Auto restoring focus to: ',
           parentFocusKey
         );
 
@@ -1515,32 +1475,19 @@ class SmartTvNavigationService {
 
   setCurrentFocusedKey(newFocusKey: string, focusDetails: FocusDetails) {
     if (
-      this.focusKey !== null &&
       this.isFocusableComponent(this.focusKey) &&
       newFocusKey !== this.focusKey
     ) {
       const oldComponent = this.focusableComponents[this.focusKey];
-      if (oldComponent) {
-        oldComponent.onUpdateFocus(false);
-        oldComponent.onBlur(
-          this.getNodeLayoutByFocusKey(this.focusKey) ?? {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            left: 0,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            node: oldComponent.node,
-          },
-          focusDetails
-        );
+      oldComponent.onUpdateFocus(false);
+      oldComponent.onBlur(
+        this.getNodeLayoutByFocusKey(this.focusKey),
+        focusDetails
+      );
 
-        oldComponent.node?.removeAttribute?.("data-focused");
+      oldComponent.node?.removeAttribute?.('data-focused');
 
-        this.log("setCurrentFocusedKey", "onBlur", oldComponent);
-      }
+      this.log('setCurrentFocusedKey', 'onBlur', oldComponent);
     }
 
     this.focusKey = newFocusKey;
@@ -1548,31 +1495,19 @@ class SmartTvNavigationService {
     if (this.isFocusableComponent(this.focusKey)) {
       const newComponent = this.focusableComponents[this.focusKey];
 
-      if (newComponent) {
-        if (this.shouldFocusDOMNode && newComponent.node) {
-          newComponent.node.focus(this.domNodeFocusOptions);
-        }
-
-        newComponent.node?.setAttribute?.("data-focused", "true");
-
-        newComponent.onUpdateFocus(true);
-          newComponent.onFocus(
-          this.getNodeLayoutByFocusKey(this.focusKey) ?? {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            left: 0,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            node: newComponent.node,
-          },
-          focusDetails
-        );
-
-        this.log("setCurrentFocusedKey", "onFocus", newComponent);
+      if (this.shouldFocusDOMNode && newComponent.node) {
+        newComponent.node.focus(this.domNodeFocusOptions);
       }
+
+      newComponent.node?.setAttribute?.('data-focused', 'true');
+
+      newComponent.onUpdateFocus(true);
+      newComponent.onFocus(
+        this.getNodeLayoutByFocusKey(this.focusKey),
+        focusDetails
+      );
+
+      this.log('setCurrentFocusedKey', 'onFocus', newComponent);
     }
   }
 
@@ -1657,7 +1592,7 @@ class SmartTvNavigationService {
   setKeyMap(keyMap: BackwardsCompatibleKeyMap) {
     this.keyMap = {
       ...this.getKeyMap(),
-      ...normalizeKeyMap(keyMap),
+      ...normalizeKeyMap(keyMap)
     };
   }
 
@@ -1672,7 +1607,6 @@ class SmartTvNavigationService {
   isParticipatingFocusableComponent(focusKey: string) {
     return (
       this.isFocusableComponent(focusKey) &&
-      this.focusableComponents[focusKey] &&
       this.focusableComponents[focusKey].focusable
     );
   }
@@ -1681,19 +1615,9 @@ class SmartTvNavigationService {
     focusKey: string,
     focusDetails: FocusDetails
   ) {
-    if (this.isParticipatingFocusableComponent(focusKey) && this.focusableComponents[focusKey]) {
+    if (this.isParticipatingFocusableComponent(focusKey)) {
       this.focusableComponents[focusKey].onFocus(
-        this.getNodeLayoutByFocusKey(focusKey) ?? {
-          x: 0,
-          y: 0,
-          width: 0,
-          height: 0,
-          left: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
-          node: this.focusableComponents[focusKey]?.node,
-        },
+        this.getNodeLayoutByFocusKey(focusKey),
         focusDetails
       );
     }
@@ -1703,19 +1627,9 @@ class SmartTvNavigationService {
     focusKey: string,
     focusDetails: FocusDetails
   ) {
-    if (this.isParticipatingFocusableComponent(focusKey) && this.focusableComponents[focusKey]) {
+    if (this.isParticipatingFocusableComponent(focusKey)) {
       this.focusableComponents[focusKey].onBlur(
-        this.getNodeLayoutByFocusKey(focusKey) ?? {
-          x: 0,
-          y: 0,
-          width: 0,
-          height: 0,
-          left: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
-          node: this.focusableComponents[focusKey]?.node,
-        },
+        this.getNodeLayoutByFocusKey(focusKey),
         focusDetails
       );
     }
@@ -1737,7 +1651,7 @@ class SmartTvNavigationService {
       return;
     }
 
-    this.log("setFocus", "focusKey", focusKey);
+    this.log('setFocus', 'focusKey', focusKey);
 
     /**
      * When focusKey is not provided or is equal to `ROOT_FOCUS_KEY`, an attempt is made,
@@ -1746,12 +1660,12 @@ class SmartTvNavigationService {
      */
     if (!focusKey || focusKey === ROOT_FOCUS_KEY) {
       // eslint-disable-next-line no-param-reassign
-      focusKey = this.getForcedFocusKey() ?? ROOT_FOCUS_KEY;
+      focusKey = this.getForcedFocusKey();
     }
 
     const newFocusKey = this.getNextFocusKey(focusKey);
 
-    this.log("setFocus", "newFocusKey", newFocusKey);
+    this.log('setFocus', 'newFocusKey', newFocusKey);
 
     this.setCurrentFocusedKey(newFocusKey, focusDetails);
     this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
@@ -1783,7 +1697,7 @@ class SmartTvNavigationService {
 
     component.layout = {
       ...layout,
-      node,
+      node
     };
   }
 
@@ -1799,7 +1713,7 @@ class SmartTvNavigationService {
       onEnterRelease,
       onArrowPress,
       onFocus,
-      onBlur,
+      onBlur
     }: FocusableComponentUpdatePayload
   ) {
     if (this.nativeMode) {
@@ -1859,5 +1773,5 @@ export const {
   updateAllLayouts,
   getCurrentFocusKey,
   doesFocusableExist,
-  updateRtl,
+  updateRtl
 } = SmartTvNavigation;

@@ -1,12 +1,12 @@
-import { WritingDirection } from "./";
+import WritingDirection from './WritingDirection';
 
 // We'll make VisualDebugger no-op for any environments lacking a DOM (e.g. SSR and React Native non-web platforms).
-const hasDOM = typeof window !== "undefined" && window.document;
+const hasDOM = typeof window !== 'undefined' && window.document;
 
 const WIDTH = hasDOM ? window.innerWidth : 0;
 const HEIGHT = hasDOM ? window.innerHeight : 0;
 
-export interface NodeLayout {
+interface NodeLayout {
   left: number;
   top: number;
   readonly right: number;
@@ -15,25 +15,25 @@ export interface NodeLayout {
   height: number;
 }
 
-export class VisualDebugger {
-  private debugCtx!: CanvasRenderingContext2D;
+class VisualDebugger {
+  private debugCtx: CanvasRenderingContext2D;
 
-  private layoutsCtx!: CanvasRenderingContext2D;
+  private layoutsCtx: CanvasRenderingContext2D;
 
-  private writingDirection!: WritingDirection;
+  private writingDirection: WritingDirection;
 
   constructor(writingDirection: WritingDirection) {
     if (hasDOM) {
       this.debugCtx = VisualDebugger.createCanvas(
-        "sn-debug",
-        "1010",
+        'sn-debug',
+        '1010',
         writingDirection
-      )!;
+      );
       this.layoutsCtx = VisualDebugger.createCanvas(
-        "sn-layouts",
-        "1000",
+        'sn-layouts',
+        '1000',
         writingDirection
-      )!;
+      );
       this.writingDirection = writingDirection;
     }
   }
@@ -43,24 +43,21 @@ export class VisualDebugger {
     zIndex: string,
     writingDirection: WritingDirection
   ) {
-    if (!hasDOM) return null;
-
     const canvas: HTMLCanvasElement =
-      (document.querySelector(`#${id}`) as HTMLCanvasElement) ||
-      document.createElement("canvas");
+      document.querySelector(`#${id}`) || document.createElement('canvas');
 
-    canvas.setAttribute("id", id);
+    canvas.setAttribute('id', id);
     canvas.setAttribute(
-      "dir",
-      writingDirection === WritingDirection.LTR ? "ltr" : "rtl"
+      'dir',
+      writingDirection === WritingDirection.LTR ? 'ltr' : 'rtl'
     );
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     canvas.style.zIndex = zIndex;
-    canvas.style.position = "fixed";
-    canvas.style.top = "0";
-    canvas.style.left = "0";
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
 
     document.body.appendChild(canvas);
 
@@ -90,18 +87,18 @@ export class VisualDebugger {
     if (!hasDOM) {
       return;
     }
-    this.layoutsCtx.strokeStyle = "green";
+    this.layoutsCtx.strokeStyle = 'green';
     this.layoutsCtx.strokeRect(
       layout.left,
       layout.top,
       layout.width,
       layout.height
     );
-    this.layoutsCtx.font = "8px monospace";
-    this.layoutsCtx.fillStyle = "red";
+    this.layoutsCtx.font = '8px monospace';
+    this.layoutsCtx.fillStyle = 'red';
 
     const horizontalStartDirection =
-      this.writingDirection === WritingDirection.LTR ? "left" : "right";
+      this.writingDirection === WritingDirection.LTR ? 'left' : 'right';
     const horizontalStartCoordinate = layout[horizontalStartDirection];
 
     this.layoutsCtx.fillText(
@@ -126,7 +123,7 @@ export class VisualDebugger {
     );
   }
 
-  drawPoint(x: number, y: number, color = "blue", size = 10) {
+  drawPoint(x: number, y: number, color = 'blue', size = 10) {
     if (!hasDOM) {
       return;
     }
@@ -135,3 +132,5 @@ export class VisualDebugger {
     this.debugCtx.strokeRect(x - size / 2, y - size / 2, size, size);
   }
 }
+
+export default VisualDebugger;

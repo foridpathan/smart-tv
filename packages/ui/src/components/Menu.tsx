@@ -104,11 +104,13 @@ export function Menu(props: MenuProps) {
       focusKey,
     },
   });
+  console.log("🚀 ~ Menu ~ focused:", focused)
   React.useEffect(() => {
     if (selfFocus) {
+      console.log("🚀 ~ Menu ~ selfFocus:", selfFocus)
       focusSelf();
     }
-  }, [focusSelf, selfFocus]);
+  }, [focusSelf, selfFocus, focused]);
 
   const handleClick = () => {
     if (!disabled && typeof onEnterPress === "function") {

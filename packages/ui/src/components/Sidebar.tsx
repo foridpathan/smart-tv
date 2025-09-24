@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FocusContext } from '../hooks';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { FocusContext } from '../hooks/useFocusContext';
 import { useFocusable } from '../hooks/useFocusable';
 
 type RenderProps = {

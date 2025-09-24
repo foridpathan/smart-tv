@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import * as React from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import {
     getCurrentFocusKey,
     destroy as navigationDestroy,
@@ -28,26 +28,15 @@ export function AppProvider({
     initialLabel = "",
     init,
 }: {
-    children: ReactNode;
+    children: React.ReactNode;
     initialLabel?: string;
     init?: Parameters<typeof navigationInit>[0];
 }) {
     const [label, setLabel] = useState(initialLabel);
 
-    // initialize navigation on mount (if requested)
-    useEffect(() => {
-        if (init) {
-            navigationInit(init as any);
-        }
-
-        return () => {
-            if (init) {
-                navigationDestroy();
-            }
-        };
-        // intentionally run only on mount/unmount
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    if (init) {
+        navigationInit(init as any);
+    }
 
     const value = useMemo<AppProviderValue>(() => ({
         label,
@@ -61,7 +50,7 @@ export function AppProvider({
         setRtl: (rtl: boolean) => navigationUpdateRtl(rtl),
     }), [label]);
 
-    return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+    return React.createElement(AppContext.Provider, { value }, children);
 }
 
 export function useAppProvider() {

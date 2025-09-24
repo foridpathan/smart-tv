@@ -1,6 +1,6 @@
-export const ELEMENT_NODE = 1;
+const ELEMENT_NODE = 1;
 
-export const getRect = (node: HTMLElement) => {
+const getRect = (node: HTMLElement) => {
   let offsetParent = node.offsetParent as HTMLElement;
   const height = node.offsetHeight;
   const width = node.offsetWidth;
@@ -21,7 +21,7 @@ export const getRect = (node: HTMLElement) => {
   };
 };
 
-export const measureLayout = (node: HTMLElement) => {
+const measureLayout = (node: HTMLElement) => {
   const relativeNode = node && node.parentElement;
 
   if (node && relativeNode) {
@@ -57,6 +57,8 @@ export const measureLayout = (node: HTMLElement) => {
     bottom: 0
   };
 };
+
+export default measureLayout;
 
 export const getBoundingClientRect = (node: HTMLElement) => {
   if (node && node.getBoundingClientRect) {
