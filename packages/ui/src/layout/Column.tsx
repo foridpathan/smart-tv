@@ -24,6 +24,12 @@ export const Column = forwardRef<HTMLDivElement, ColumnProps>(function Column(
 
   React.useImperativeHandle(ref, () => innerRef.current, [innerRef]);
 
+  React.useEffect(() => {
+    if (rest.forceFocus) {
+      focusSelf();
+    }
+  }, [rest.forceFocus, focusSelf])
+
   const style = typeof gap === 'number' ? { gap: `${gap}px` } : { gap };
 
   return (

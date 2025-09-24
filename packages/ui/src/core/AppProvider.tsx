@@ -2,6 +2,7 @@ import * as React from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 import {
     getCurrentFocusKey,
+    InitOptions,
     destroy as navigationDestroy,
     init as navigationInit,
     navigateByDirection as navigationNavigateByDirection,
@@ -30,18 +31,18 @@ export function AppProvider({
 }: {
     children: React.ReactNode;
     initialLabel?: string;
-    init?: Parameters<typeof navigationInit>[0];
+    init?: InitOptions
 }) {
     const [label, setLabel] = useState(initialLabel);
 
     if (init) {
-        navigationInit(init as any);
+        navigationInit(init);
     }
 
     const value = useMemo<AppProviderValue>(() => ({
         label,
         setLabel,
-        init: (opts = {}) => navigationInit(opts as any),
+        init: (opts = {}) => navigationInit(opts),
         destroy: () => navigationDestroy(),
         setFocus: (focusKey: string) => navigationSetFocus(focusKey),
         navigate: (direction: "up" | "down" | "left" | "right") =>

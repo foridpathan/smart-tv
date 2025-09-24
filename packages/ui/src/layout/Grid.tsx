@@ -25,6 +25,12 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(function Grid(
 
   React.useImperativeHandle(ref, () => innerRef.current, [innerRef]);
 
+  React.useEffect(() => {
+    if (rest.forceFocus) {
+      focusSelf();
+    }
+  }, [rest.forceFocus, focusSelf])
+
   const style: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,

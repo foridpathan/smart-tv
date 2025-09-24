@@ -18,7 +18,6 @@ body {
   text-rendering: optimizeLegibility;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
   min-height: 100vh;
 }
 

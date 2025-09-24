@@ -69,8 +69,6 @@ export function Menu(props: MenuProps) {
 
   const { ref, focused, focusSelf } = useFocusable({
     onBlur,
-    // provide a wrapper so that when no custom onEnterPress is provided
-    // Enter will navigate to `href` when present (TV/remote enter)
     onEnterPress: !disabled
       ? (details) => {
         if (typeof onEnterPress === "function") {
@@ -104,13 +102,11 @@ export function Menu(props: MenuProps) {
       focusKey,
     },
   });
-  console.log("🚀 ~ Menu ~ focused:", focused)
   React.useEffect(() => {
     if (selfFocus) {
-      console.log("🚀 ~ Menu ~ selfFocus:", selfFocus)
       focusSelf();
     }
-  }, [focusSelf, selfFocus, focused]);
+  }, [focusSelf, selfFocus]);
 
   const handleClick = () => {
     if (!disabled && typeof onEnterPress === "function") {
@@ -140,7 +136,7 @@ export function Menu(props: MenuProps) {
       }
     }
   };
-  const Element: any = href ? "a" : "button";
+  const Element: any = "button";
 
   return (
     <Element

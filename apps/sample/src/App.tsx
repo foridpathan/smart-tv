@@ -4,12 +4,12 @@ import Layout from './components/Layout';
 
 function App() {
   return (
-    <div className="tv-main">
+    <div className="tv-main h-screen w-screen bg-gradient-to-b from-[#061022] via-[#0b1730] to-[#04101a]">
       <AppProvider init={{
         debug: false,
         visualDebug: false,
         distanceCalculationMethod: 'center',
-      }}>
+      }} >
         <RouterProvider>
           <Layout>
             <Route path="/" component={HomePage} />
