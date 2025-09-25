@@ -15,6 +15,12 @@ export type QueryOptions<T = unknown> = {
   enabled?: boolean
   select?: (data: any) => T
   keepPreviousData?: boolean
+  // automatically refetch when window gains focus
+  refetchOnWindowFocus?: boolean
+  // refetch on mount if data is stale
+  refetchOnMount?: boolean
+  // refetch on network reconnect (not implemented yet)
+  refetchOnReconnect?: boolean
 }
 
 export type MutationOptions<TData = unknown, TVariables = unknown> = {

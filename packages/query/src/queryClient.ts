@@ -9,6 +9,10 @@ type Inflight = {
 export class QueryClient {
   cache = new QueryCache()
   inflight = new Map<string, Inflight>()
+  // map of active queries -> array of refetch callbacks
+  private active = new Map<string, Set<() => void>>()
+  // track whether we have a global window focus listener
+  private focusListenerAttached = false
   // concrete default options type to avoid complex generic Required<> mismatch
   defaultOptions: {
     staleTime: number
@@ -34,6 +38,38 @@ export class QueryClient {
 
   private keyToString(key: QueryKey) {
     return Array.isArray(key) ? JSON.stringify(key) : String(key)
+  }
+
+  // register an active query so it can be invalidated/refetched
+  registerActive(key: QueryKey, refetch: () => void, options?: QueryOptions) {
+    const k = this.keyToString(key)
+    let set = this.active.get(k)
+    if (!set) {
+      set = new Set()
+      this.active.set(k, set)
+    }
+    set.add(refetch)
+
+    // attach global focus listener lazily when any query opts-in
+    if (options?.refetchOnWindowFocus && !this.focusListenerAttached && typeof window !== 'undefined') {
+      this.focusListenerAttached = true
+      window.addEventListener('focus', this.handleWindowFocus)
+    }
+  }
+
+  unregisterActive(key: QueryKey, refetch: () => void) {
+    const k = this.keyToString(key)
+    const set = this.active.get(k)
+    if (!set) return
+    set.delete(refetch)
+    if (set.size === 0) this.active.delete(k)
+  }
+
+  private handleWindowFocus = () => {
+    for (const [key, set] of this.active) {
+      // naive: call all registered refetches; each hook will decide if it should refetch
+      for (const r of set) r()
+    }
   }
 
   async fetchQuery<T = unknown>(key: QueryKey, fetcher: () => Promise<T>, options?: QueryOptions) {
@@ -98,14 +134,23 @@ export class QueryClient {
     }
   }
 
-  invalidateQueries(key?: QueryKey) {
+  // invalidate queries. If refetch = true, active queries matching the key will refetch
+  invalidateQueries(key?: QueryKey, opts?: { refetch?: boolean }) {
     if (!key) {
       // purge entire cache
-      // naive: recreate
       this.cache = new QueryCache()
+      if (opts?.refetch) {
+        for (const set of this.active.values()) for (const r of set) r()
+      }
       return
     }
+
+    const k = this.keyToString(key)
     this.cache.remove(key)
+    if (opts?.refetch) {
+      const set = this.active.get(k)
+      if (set) for (const r of set) r()
+    }
   }
 
   getQueryData<T = unknown>(key: QueryKey) {

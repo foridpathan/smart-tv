@@ -22,6 +22,8 @@ export function useQuery<T = unknown>(key: QueryKey, fetcher: () => Promise<T>, 
   const [data, setData] = React.useState<T | undefined>(initial)
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>(cached.status)
   const [error, setError] = React.useState<unknown | undefined>(cached.error)
+  // stable refetch callback used for registration
+  const fetchRef = React.useRef<() => void>(() => {})
 
   React.useEffect(() => {
     const unsub = client.cache.subscribe(key, () => {
@@ -31,11 +33,34 @@ export function useQuery<T = unknown>(key: QueryKey, fetcher: () => Promise<T>, 
       setData(s.data)
     })
 
+    const doFetch = () => {
+      const s = client.cache.getState<T>(key)
+      const isStale = !s.updatedAt || Date.now() - s.updatedAt > resolvedOptions.staleTime
+      if (s.status === 'idle' || isStale) {
+        if (!resolvedOptions.keepPreviousData) setData(undefined)
+        client.fetchQuery<T>(key, fetcher, resolvedOptions).catch(() => {})
+      } else {
+        if (resolvedOptions.select && s.data !== undefined) setData(resolvedOptions.select(s.data))
+      }
+    }
+
+    fetchRef.current = () => {
+      // called by client on invalidate or focus; respect options
+      if (resolvedOptions.enabled) {
+        // refetchOnMount/WindowFocus behavior: let the hook decide whether to refetch
+        doFetch()
+      }
+    }
+
+    // register active so invalidate/refocus can call us
+    client.registerActive(key, () => fetchRef.current(), options)
+
     let shouldFetch = resolvedOptions.enabled !== false
     if (shouldFetch) {
       const s = client.cache.getState<T>(key)
       const isStale = !s.updatedAt || Date.now() - s.updatedAt > resolvedOptions.staleTime
-      if (s.status === 'idle' || isStale) {
+      const shouldRefetchOnMount = resolvedOptions.refetchOnMount ?? true
+      if (s.status === 'idle' || (isStale && shouldRefetchOnMount)) {
         // keep previous data if asked
         if (!resolvedOptions.keepPreviousData) setData(undefined)
         client.fetchQuery<T>(key, fetcher, resolvedOptions).catch(() => {})
@@ -46,6 +71,7 @@ export function useQuery<T = unknown>(key: QueryKey, fetcher: () => Promise<T>, 
 
     return () => {
       unsub()
+      client.unregisterActive(key, () => fetchRef.current())
     }
   }, [client, JSON.stringify(key)])
 

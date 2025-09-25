@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@smart-tv/query';
+import { tvFetch, useInfiniteQuery } from '@smart-tv/query';
 import { Button, Row, Screen, Section } from '@smart-tv/ui';
 import React, { useCallback, useState } from 'react';
 import { MOVIE } from '../data/movie';
@@ -55,7 +55,7 @@ const HomePage: React.FC = () => {
 
   const { data, isFetching, fetchNext, hasNextPage } = useInfiniteQuery(['movies-infinite'], async (cursor) => {
     const url = 'https://content-prod.services.toffeelive.com/toffee/bn/dhk/smart-tv/rail/generic/editorial-dynamic/48d7456f06d4db0ea467fd6b1da362e0?page=' + (cursor ?? 1)
-    const res = await fetch(url).then(r => r.json())
+    const res = await tvFetch(url).then(r => r.json())
     return res
   }, { mapPage: jsonFakeryMapPage, getHasNext })
 
