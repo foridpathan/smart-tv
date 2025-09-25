@@ -9,8 +9,9 @@ const Movies = () => {
                 <div className="text-white text-5xl font-bold flex items-center justify-center h-full">Movies Page</div>
                 <div >
                     <Grid
-                        
+                        columns={4}
                         virtualize={{ enabled: true, itemSize: 320, buffer: 2, debug: true, preserveFocus: true }}
+                        forceFocus
                     >
                         {
                             EXTENT_MOVIE.map((movie, i) => (

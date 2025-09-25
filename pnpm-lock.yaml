@@ -81,6 +81,9 @@ importers:
       '@babel/runtime-corejs3':
         specifier: ^7.28.3
         version: 7.28.4
+      '@smart-tv/query':
+        specifier: workspace:*
+        version: link:../../packages/query
       '@smart-tv/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -266,6 +269,9 @@ importers:
 
   packages/query:
     dependencies:
+      core-js:
+        specifier: ^3.45.1
+        version: 3.45.1
       react:
         specifier: '*'
         version: 19.1.1

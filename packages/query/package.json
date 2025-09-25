@@ -1,10 +1,12 @@
 {
-  "name": "@stv/query",
+  "name": "@smart-tv/query",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p .",
     "build:watch": "tsc -p . -w",
@@ -12,10 +14,12 @@
   },
   "peerDependencies": {
     "react": "*"
-  }
-  ,
+  },
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "@types/react": "^18.2.0"
+    "@types/react": "^18.2.0",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "core-js": "^3.45.1"
   }
 }

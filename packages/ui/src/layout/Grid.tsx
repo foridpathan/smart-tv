@@ -43,7 +43,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(function Grid(
   const innerRef = useRef<HTMLDivElement | null>(null);
   const measurerRef = useRef<HTMLDivElement | null>(null);
 
-  const { ref: fRef, focusKey: providedFocusKey, focused } = useFocusable({ focusKey, focusable: true, trackChildren, saveLastFocusedChild, ...rest } as UseFocusableConfig);
+  const { ref: fRef, focusKey: providedFocusKey, focused, focusSelf } = useFocusable({ focusKey, focusable: true, trackChildren, saveLastFocusedChild, ...rest } as UseFocusableConfig);
   useEffect(() => { innerRef.current = (fRef as any)?.current ?? innerRef.current; }, [fRef]);
   React.useImperativeHandle(ref, () => innerRef.current, [innerRef]);
 
@@ -174,6 +174,13 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(function Grid(
     };
     return () => { if (c) delete c.revealIndex; };
   }, [itemHeight, itemsPerRow, totalItems, buffer, totalRows]);
+
+  // force focus handling still kept
+  useEffect(() => {
+    if (rest.forceFocus) {
+      focusSelf();
+    }
+  }, [rest.forceFocus, focusSelf]);
 
   const gridStyle: React.CSSProperties = { display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: typeof gap === 'number' ? `${gap}px` : gap };
 

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@smart-tv/ui": "workspace:*",
+    "@smart-tv/query": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "@babel/runtime": "^7.28.3",

@@ -8,7 +8,7 @@ export const QueryClientProvider: React.FC<{ client: QueryClient; children?: Rea
   return <ClientContext.Provider value={client}>{children}</ClientContext.Provider>
 }
 
-function useClient() {
+export function useClient() {
   const c = React.useContext(ClientContext)
   if (!c) throw new Error('QueryClientProvider missing')
   return c

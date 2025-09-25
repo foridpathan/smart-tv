@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@smart-tv/query';
 import { AppProvider, Route, RouterProvider } from '@smart-tv/ui';
 import HomePage from './components/HomePage';
 import Layout from './components/Layout';
@@ -7,6 +8,7 @@ import Favorites from './pages/Favorites';
 import Movies from './pages/Movies';
 import Search from './pages/search';
 import User from './pages/User';
+const client = new QueryClient({ staleTime: 1000 * 10, cacheTime: 1000 * 60 })
 
 
 const Menus = [
@@ -56,23 +58,25 @@ const Menus = [
 
 function App() {
   return (
-    <div className="tv-main h-screen w-screen bg-gradient-to-b from-[#061022] via-[#0b1730] to-[#04101a]">
-      <AppProvider init={{
-        debug: false,
-        visualDebug: false,
-        distanceCalculationMethod: 'center',
-      }} >
-        <RouterProvider>
-          <Layout>
-            {
-              Menus.map((menu) => (
-                <Route key={menu.focusKey} path={menu.to} component={menu.component} skippable={menu.skippable} />
-              ))
-            }
-          </Layout>
-        </RouterProvider>
-      </AppProvider>
-    </div>
+    <QueryClientProvider client={client}>
+      <div className="tv-main h-screen w-screen bg-gradient-to-b from-[#061022] via-[#0b1730] to-[#04101a]">
+        <AppProvider init={{
+          debug: false,
+          visualDebug: false,
+          distanceCalculationMethod: 'center',
+        }} >
+          <RouterProvider>
+            <Layout>
+              {
+                Menus.map((menu) => (
+                  <Route key={menu.focusKey} path={menu.to} component={menu.component} skippable={menu.skippable} />
+                ))
+              }
+            </Layout>
+          </RouterProvider>
+        </AppProvider>
+      </div>
+    </QueryClientProvider>
   );
 }
 
