@@ -24,8 +24,9 @@ const HomePage: React.FC = () => {
           <Row
             forceFocus
             gap={16}
-            className="mt-8"
+            className=""
             scrollProps={{ behavior: 'smooth', block: 'nearest', inline: 'end' }}
+            virtualize={{ enabled: true, itemSize: 320, buffer: 2 }}
           >
             {
               MOVIE.map((movie) => (
@@ -52,6 +53,7 @@ const HomePage: React.FC = () => {
             gap={16}
             className="mt-8"
             scrollProps={{ behavior: 'smooth', block: 'nearest', inline: 'end' }}
+            virtualize={{ enabled: true, itemSize: 320, buffer: 2 }}
           >
             {
               MOVIE.map((movie) => (
@@ -78,6 +80,7 @@ const HomePage: React.FC = () => {
             gap={16}
             className="mt-8"
             scrollProps={{ behavior: 'smooth', block: 'nearest', inline: 'end' }}
+            virtualize={{ enabled: true, itemSize: 320, buffer: 2 }}
           >
             {
               MOVIE.map((movie) => (
