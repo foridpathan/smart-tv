@@ -22,7 +22,6 @@ export const Section = forwardRef<HTMLDivElement, SectionProps>(function Section
     className = '',
     focusKey,
     viewOnly = false,
-    selfFocus = false,
     onEnterPress,
     onFocus,
     onBlur,
@@ -34,7 +33,7 @@ export const Section = forwardRef<HTMLDivElement, SectionProps>(function Section
   ref
 ) {
   // useFocusable returns a ref and focus helpers for the section
-  const { ref: innerRef, focusKey: providedFocusKey, focusSelf, focused } =
+  const { ref: innerRef, focusKey: providedFocusKey, focused } =
     useFocusable({
       focusKey,
       focusable: !viewOnly,

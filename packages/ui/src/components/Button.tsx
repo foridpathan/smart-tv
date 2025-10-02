@@ -21,11 +21,11 @@ type RenderProps = {
 
 type ButtonProps = {
   children?: React.ReactNode | ((props: RenderProps) => React.ReactNode);
-  onBlur?: BlurHandler<any>;
-  onEnterPress?: EnterPressHandler<any> | undefined;
-  onFocus?: FocusHandler<any>;
-  onEnterRelease?: EnterReleaseHandler<any> | undefined;
-  onArrowPress?: ArrowPressHandler<any> | undefined;
+  onBlur?: BlurHandler;
+  onEnterPress?: EnterPressHandler | undefined;
+  onFocus?: FocusHandler;
+  onEnterRelease?: EnterReleaseHandler | undefined;
+  onArrowPress?: ArrowPressHandler | undefined;
   focusKey: string;
   className?: string;
   active?: string;
