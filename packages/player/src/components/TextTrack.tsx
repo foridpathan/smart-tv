@@ -1,8 +1,8 @@
 import { useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
+import React, { memo, useCallback } from 'react';
+import { usePlayerInstance, useTextTracks } from '../hooks/useOptimizedHooks';
 import { TextTrack as TextTrackType } from '../types';
-import { cn, getDisplayLanguage } from '../utils';
+import { cn, compareTrackProps, getDisplayLanguage } from '../utils';
 
 interface TextTrackProps {
   className?: string;
@@ -10,29 +10,30 @@ interface TextTrackProps {
   onClose?: () => void;
 }
 
-export const TextTrack: React.FC<TextTrackProps> = ({
+const TextTrackComponent: React.FC<TextTrackProps> = ({
   className,
   onTrackSelect,
   onClose,
 }) => {
-  const { player, textTracks } = useMediaContext();
+  const player = usePlayerInstance();
+  const textTracks = useTextTracks();
   
   const { ref } = useFocusable({
     focusKey: 'text-track-selector',
     trackChildren: true,
   });
 
-  const handleTrackSelect = (track: TextTrackType) => {
+  const handleTrackSelect = useCallback((track: TextTrackType) => {
     if (player) {
       player.selectTextTrack(track.id);
       onTrackSelect?.(track);
       onClose?.();
     }
-  };
+  }, [player, onTrackSelect, onClose]);
 
-  const handleDisableSubtitles = () => {
+  const handleDisableSubtitles = useCallback(() => {
     // Disable all text tracks
-    textTracks.forEach(track => {
+    textTracks.forEach((track: TextTrackType) => {
       if (player) {
         // Disable the track
         track.mode = 'disabled';
@@ -40,7 +41,7 @@ export const TextTrack: React.FC<TextTrackProps> = ({
     });
     onTrackSelect?.(null);
     onClose?.();
-  };
+  }, [textTracks, player, onTrackSelect, onClose]);
 
   return (
     <div
@@ -59,14 +60,14 @@ export const TextTrack: React.FC<TextTrackProps> = ({
         <TextTrackItem
           track={null}
           focusKey="text-track-off"
-          isSelected={!textTracks.some(track => track.active)}
+          isSelected={!textTracks.some((track: TextTrackType) => track.active)}
           onSelect={handleDisableSubtitles}
           label="Off"
         />
         
         {textTracks
-          .filter(track => track.kind === 'subtitles' || track.kind === 'captions')
-          .map((track, index) => (
+          .filter((track: TextTrackType) => track.kind === 'subtitles' || track.kind === 'captions')
+          .map((track: TextTrackType, index: number) => (
             <TextTrackItem
               key={track.id}
               track={track}
@@ -79,6 +80,8 @@ export const TextTrack: React.FC<TextTrackProps> = ({
     </div>
   );
 };
+
+export const TextTrack = memo(TextTrackComponent, compareTrackProps);
 
 interface TextTrackItemProps {
   track: TextTrackType | null;

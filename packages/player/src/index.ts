@@ -20,10 +20,36 @@ export {
     MediaProvider,
     useMediaContext,
     usePlayer,
-    usePlayerActions, usePlayerDisplay,
-    usePlayerPlayback, usePlayerState, usePlayerTime,
-    usePlayerVolume, useTracks
+    usePlayerActions,
+    usePlayerDisplay,
+    usePlayerPlayback,
+    usePlayerState,
+    usePlayerTime,
+    usePlayerVolume,
+    useTracks
 } from "./hooks/MediaContext";
+
+// Optimized hooks to prevent unnecessary re-renders
+export {
+    useAudioTracks,
+    useBuffered,
+    useCurrentTime,
+    useDuration,
+    useFullscreen,
+    useLoading,
+    useMuted,
+    usePaused,
+    usePictureInPicture,
+    usePlaybackState,
+    usePlayerActionsOnly,
+    usePlayerControls,
+    usePlayerInstance,
+    useTextTracks,
+    useTimeProgress,
+    useVideoTracks,
+    useVolume,
+    useVolumeState
+} from "./hooks/useOptimizedHooks";
 
 // Types
 export type {

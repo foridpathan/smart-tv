@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import shaka from 'shaka-player';
 import { useMediaContext } from '../hooks/MediaContext';
 import { AudioTrack, MediaPlayerInstance, MediaPlayerProps, TextTrack, VideoTrack } from '../types';
@@ -50,6 +50,7 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
     const lastTimeUpdateRef = useRef<number>(0);
+    const throttleTimeoutRef = useRef<number | null>(null);
     
     // Throttle time updates to prevent excessive re-renders (update at most every 100ms)
     const TIME_UPDATE_THROTTLE = 100;
@@ -360,94 +361,119 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
       return () => clearTimeout(timeoutId);
     }, [src, onLoadedData, onError]);
 
+    // Memoize event handlers to prevent recreation on every render
+    const handlePlay = useCallback(() => {
+      onPlay?.();
+      mediaContext?.actions.setPaused(false);
+    }, [onPlay, mediaContext?.actions]);
+
+    const handlePause = useCallback(() => {
+      onPause?.();
+      mediaContext?.actions.setPaused(true);
+    }, [onPause, mediaContext?.actions]);
+
+    const handleEnded = useCallback(() => {
+      onEnded?.();
+      mediaContext?.actions.setEnded(true);
+    }, [onEnded, mediaContext?.actions]);
+
+    const handleTimeUpdate = useCallback(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      const currentTime = video.currentTime;
+      const now = Date.now();
+      
+      // More aggressive throttling - use both time-based and animation frame based throttling
+      if (now - lastTimeUpdateRef.current >= TIME_UPDATE_THROTTLE) {
+        // Cancel any pending timeout
+        if (throttleTimeoutRef.current) {
+          clearTimeout(throttleTimeoutRef.current);
+        }
+        
+        // Schedule the update for the next animation frame to avoid layout thrashing
+        throttleTimeoutRef.current = window.setTimeout(() => {
+          onTimeUpdate?.(currentTime);
+          mediaContext?.actions.setCurrentTime(currentTime);
+          lastTimeUpdateRef.current = now;
+          throttleTimeoutRef.current = null;
+        }, 0);
+      }
+    }, [onTimeUpdate, mediaContext?.actions]);
+
+    const handleDurationChange = useCallback(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      const duration = video.duration;
+      onDurationChange?.(duration);
+      mediaContext?.actions.setDuration(duration);
+    }, [onDurationChange, mediaContext?.actions]);
+
+    const handleVolumeChange = useCallback(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      const volume = video.volume;
+      const muted = video.muted;
+      onVolumeChange?.(volume);
+      mediaContext?.actions.setVolume(volume);
+      mediaContext?.actions.setMuted(muted);
+    }, [onVolumeChange, mediaContext?.actions]);
+
+    const handleProgress = useCallback(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      onProgress?.(video.buffered);
+      mediaContext?.actions.setBuffered(video.buffered);
+    }, [onProgress, mediaContext?.actions]);
+
+    const handleSeeking = useCallback(() => {
+      onSeeking?.();
+      mediaContext?.actions.setSeeking(true);
+    }, [onSeeking, mediaContext?.actions]);
+
+    const handleSeeked = useCallback(() => {
+      onSeeked?.();
+      mediaContext?.actions.setSeeking(false);
+    }, [onSeeked, mediaContext?.actions]);
+
+    const handleWaiting = useCallback(() => {
+      onWaiting?.();
+      mediaContext?.actions.setWaiting(true);
+    }, [onWaiting, mediaContext?.actions]);
+
+    const handleCanPlay = useCallback(() => {
+      onCanPlay?.();
+      mediaContext?.actions.setWaiting(false);
+    }, [onCanPlay, mediaContext?.actions]);
+
+    const handleRateChange = useCallback(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      const rate = video.playbackRate;
+      onPlaybackRateChange?.(rate);
+      mediaContext?.actions.setPlaybackRate(rate);
+    }, [onPlaybackRateChange, mediaContext?.actions]);
+
+    const handleFullscreenChange = useCallback(() => {
+      const isFullscreen = !!document.fullscreenElement;
+      onFullscreenChange?.(isFullscreen);
+      mediaContext?.actions.setFullscreen(isFullscreen);
+    }, [onFullscreenChange, mediaContext?.actions]);
+
+    const handlePipChange = useCallback(() => {
+      const isPip = !!(document as any).pictureInPictureElement;
+      onPictureInPictureChange?.(isPip);
+      mediaContext?.actions.setPictureInPicture(isPip);
+    }, [onPictureInPictureChange, mediaContext?.actions]);
+
     // Set up video event listeners
     useEffect(() => {
       const video = videoRef.current;
       if (!video) return;
-
-      const handlePlay = () => {
-        onPlay?.();
-        mediaContext?.actions.setPaused(false);
-      };
-
-      const handlePause = () => {
-        onPause?.();
-        mediaContext?.actions.setPaused(true);
-      };
-
-      const handleEnded = () => {
-        onEnded?.();
-        mediaContext?.actions.setEnded(true);
-      };
-
-      const handleTimeUpdate = () => {
-        const currentTime = video.currentTime;
-        const now = Date.now();
-        
-        // Throttle time updates to prevent excessive re-renders
-        if (now - lastTimeUpdateRef.current >= TIME_UPDATE_THROTTLE) {
-          onTimeUpdate?.(currentTime);
-          mediaContext?.actions.setCurrentTime(currentTime);
-          lastTimeUpdateRef.current = now;
-        }
-      };
-
-      const handleDurationChange = () => {
-        const duration = video.duration;
-        onDurationChange?.(duration);
-        mediaContext?.actions.setDuration(duration);
-      };
-
-      const handleVolumeChange = () => {
-        const volume = video.volume;
-        const muted = video.muted;
-        onVolumeChange?.(volume);
-        mediaContext?.actions.setVolume(volume);
-        mediaContext?.actions.setMuted(muted);
-      };
-
-      const handleProgress = () => {
-        onProgress?.(video.buffered);
-        mediaContext?.actions.setBuffered(video.buffered);
-      };
-
-      const handleSeeking = () => {
-        onSeeking?.();
-        mediaContext?.actions.setSeeking(true);
-      };
-
-      const handleSeeked = () => {
-        onSeeked?.();
-        mediaContext?.actions.setSeeking(false);
-      };
-
-      const handleWaiting = () => {
-        onWaiting?.();
-        mediaContext?.actions.setWaiting(true);
-      };
-
-      const handleCanPlay = () => {
-        onCanPlay?.();
-        mediaContext?.actions.setWaiting(false);
-      };
-
-      const handleRateChange = () => {
-        const rate = video.playbackRate;
-        onPlaybackRateChange?.(rate);
-        mediaContext?.actions.setPlaybackRate(rate);
-      };
-
-      const handleFullscreenChange = () => {
-        const isFullscreen = !!document.fullscreenElement;
-        onFullscreenChange?.(isFullscreen);
-        mediaContext?.actions.setFullscreen(isFullscreen);
-      };
-
-      const handlePipChange = () => {
-        const isPip = !!(document as any).pictureInPictureElement;
-        onPictureInPictureChange?.(isPip);
-        mediaContext?.actions.setPictureInPicture(isPip);
-      };
 
       // Add event listeners
       video.addEventListener('play', handlePlay);
@@ -501,7 +527,26 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
         document.removeEventListener('enterpictureinpicture', handlePipChange);
         document.removeEventListener('leavepictureinpicture', handlePipChange);
       };
-    }, []);
+    }, [
+      handlePlay,
+      handlePause,
+      handleEnded,
+      handleTimeUpdate,
+      handleDurationChange,
+      handleVolumeChange,
+      handleProgress,
+      handleSeeking,
+      handleSeeked,
+      handleWaiting,
+      handleCanPlay,
+      handleRateChange,
+      handleFullscreenChange,
+      handlePipChange,
+      onCanPlayThrough,
+      onLoadStart,
+      onLoadedData,
+      onLoadedMetadata
+    ]);
 
     // Set initial properties
     useEffect(() => {
@@ -521,6 +566,15 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
         video.poster = poster;
       }
     }, [autoPlay, loop, muted, controls, volume, playbackRate, crossOrigin, preload, poster]);
+
+    // Cleanup throttle timeout on unmount
+    useEffect(() => {
+      return () => {
+        if (throttleTimeoutRef.current) {
+          clearTimeout(throttleTimeoutRef.current);
+        }
+      };
+    }, []);
 
     return (
       <video

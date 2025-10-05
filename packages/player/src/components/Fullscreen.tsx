@@ -1,7 +1,7 @@
 import { useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
-import { cn } from '../utils';
+import React, { memo, useCallback } from 'react';
+import { useFullscreen, usePlayerInstance } from '../hooks/useOptimizedHooks';
+import { cn, shallowEqual } from '../utils';
 
 interface FullscreenProps {
   className?: string;
@@ -10,21 +10,16 @@ interface FullscreenProps {
   onToggle?: (isFullscreen: boolean) => void;
 }
 
-export const Fullscreen: React.FC<FullscreenProps> = ({
+const FullscreenComponent: React.FC<FullscreenProps> = ({
   className,
   style,
   focusKey = 'fullscreen-button',
   onToggle,
 }) => {
-  const { state, player } = useMediaContext();
-  const { fullscreen } = state;
+  const player = usePlayerInstance();
+  const fullscreen = useFullscreen();
 
-  const { ref, focused } = useFocusable({
-    focusKey,
-    onEnterPress: handleToggle,
-  });
-
-  async function handleToggle() {
+  const handleToggle = useCallback(async () => {
     if (!player) return;
     
     try {
@@ -37,7 +32,12 @@ export const Fullscreen: React.FC<FullscreenProps> = ({
     } catch (error) {
       console.warn('Fullscreen toggle failed:', error);
     }
-  }
+  }, [player, fullscreen, onToggle]);
+
+  const { ref, focused } = useFocusable({
+    focusKey,
+    onEnterPress: handleToggle,
+  });
 
   const FullscreenIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="player-w-5 player-h-5">
@@ -67,3 +67,5 @@ export const Fullscreen: React.FC<FullscreenProps> = ({
     </button>
   );
 };
+
+export const Fullscreen = memo(FullscreenComponent, shallowEqual);

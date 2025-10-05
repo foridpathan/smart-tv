@@ -1,8 +1,8 @@
 import { FocusContext, useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
+import React, { memo, useCallback, useMemo } from 'react';
+import { usePlayerInstance, useVideoTracks } from '../hooks/useOptimizedHooks';
 import { VideoTrack as VideoTrackType } from '../types';
-import { cn } from '../utils';
+import { cn, compareTrackProps } from '../utils';
 
 interface VideoTrackProps {
   className?: string;
@@ -10,42 +10,44 @@ interface VideoTrackProps {
   onClose?: () => void;
 }
 
-export const VideoTrack: React.FC<VideoTrackProps> = ({
+const VideoTrackComponent: React.FC<VideoTrackProps> = ({
   className,
   onTrackSelect,
   onClose,
 }) => {
-  const { player, videoTracks } = useMediaContext();
+  const player = usePlayerInstance();
+  const videoTracks = useVideoTracks();
 
   const { ref, focusKey } = useFocusable({
     focusKey: 'video-track-selector',
     trackChildren: true,
   });
 
-  // Sort tracks by height (quality) in descending order
-  const sortedTracks = [...videoTracks]
-    .sort((a, b) => b.height - a.height)
-    .filter((track, index, self) => {
-      // Remove duplicates based on height
-      return index === self.findIndex(t => t.height === track.height);
-    });
+  // Sort tracks by height (quality) in descending order - memoized to prevent recalculation
+  const sortedTracks = useMemo(() => 
+    [...videoTracks]
+      .sort((a, b) => b.height - a.height)
+      .filter((track, index, self) => {
+        // Remove duplicates based on height
+        return index === self.findIndex(t => t.height === track.height);
+      }), [videoTracks]);
 
-  const handleTrackSelect = (track: VideoTrackType) => {
+  const handleTrackSelect = useCallback((track: VideoTrackType) => {
     if (player) {
       player.selectVideoTrack(track.id);
       onTrackSelect?.(track);
       onClose?.();
     }
-  };
+  }, [player, onTrackSelect, onClose]);
 
-  const handleAutoQuality = () => {
+  const handleAutoQuality = useCallback(() => {
     // Reset to auto quality by not selecting any specific track
     // Shaka Player will handle adaptive streaming
     if (player) {
       // Enable adaptation
       onClose?.();
     }
-  };
+  }, [player, onClose]);
 
   return (
     <FocusContext.Provider value={focusKey}>
@@ -84,6 +86,8 @@ export const VideoTrack: React.FC<VideoTrackProps> = ({
     </FocusContext.Provider>
   );
 };
+
+export const VideoTrack = memo(VideoTrackComponent, compareTrackProps);
 
 interface VideoTrackItemProps {
   track: VideoTrackType | null;

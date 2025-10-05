@@ -1,8 +1,8 @@
 import { FocusContext, useFocusable } from '@smart-tv/ui';
-import React, { memo } from 'react';
-import { usePlayer, useTracks } from '../hooks/MediaContext';
+import React, { memo, useCallback } from 'react';
+import { useAudioTracks, usePlayerInstance } from '../hooks/useOptimizedHooks';
 import { AudioTrack as AudioTrackType } from '../types';
-import { cn, getDisplayLanguage } from '../utils';
+import { cn, compareTrackProps, getDisplayLanguage } from '../utils';
 
 interface AudioTrackProps {
   className?: string;
@@ -21,21 +21,21 @@ const AudioTrackComponent: React.FC<AudioTrackProps> = ({
   selectedClass,
   focusClass
 }) => {
-  const player = usePlayer();
-  const { audioTracks } = useTracks();
+  const player = usePlayerInstance();
+  const audioTracks = useAudioTracks();
 
   const { ref, focusKey } = useFocusable({
     focusKey: 'audio-track-selector',
     trackChildren: true,
   });
 
-  const handleTrackSelect = (track: AudioTrackType) => {
+  const handleTrackSelect = useCallback((track: AudioTrackType) => {
     if (player) {
       player.selectAudioTrack(track.id);
       onTrackSelect?.(track);
       onClose?.();
     }
-  };
+  }, [player, onTrackSelect, onClose]);
 
   return (
     <FocusContext.Provider value={focusKey}>
@@ -43,8 +43,7 @@ const AudioTrackComponent: React.FC<AudioTrackProps> = ({
         ref={ref}
         className={cn(
           'player-bg-black player-bg-opacity-80 player-text-white player-p-6 player-rounded-lg player-min-w-80',
-          className,
-          Math.random().toString()
+          className
         )}
       >
         <div className="player-mb-4">
@@ -52,7 +51,7 @@ const AudioTrackComponent: React.FC<AudioTrackProps> = ({
         </div>
 
         <div className="player-space-y-2">
-          {audioTracks.map((track, index) => (
+          {audioTracks.map((track: AudioTrackType, index: number) => (
             <AudioTrackItem
               key={track.id}
               track={track}
@@ -71,7 +70,7 @@ const AudioTrackComponent: React.FC<AudioTrackProps> = ({
 };
 
 // Export memoized component to prevent unnecessary re-renders
-export const AudioTrack = memo(AudioTrackComponent);
+export const AudioTrack = memo(AudioTrackComponent, compareTrackProps);
 
 interface AudioTrackItemProps {
   className?: string

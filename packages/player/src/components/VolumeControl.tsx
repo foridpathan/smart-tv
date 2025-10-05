@@ -1,10 +1,10 @@
 import { useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
+import React, { memo, useCallback } from 'react';
+import { usePlayerInstance, useVolumeState } from '../hooks/useOptimizedHooks';
 import { VolumeControlProps } from '../types';
-import { clamp, cn } from '../utils';
+import { clamp, cn, shallowEqual } from '../utils';
 
-export const VolumeControl: React.FC<VolumeControlProps> = ({
+export const VolumeControl: React.FC<VolumeControlProps> = memo(({
   className,
   style,
   focusKey = 'volume-control',
@@ -14,8 +14,24 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
   onVolumeChange,
   onMuteToggle,
 }) => {
-  const { state, player } = useMediaContext();
-  const { volume, muted } = state;
+  const player = usePlayerInstance();
+  const { volume, muted } = useVolumeState();
+
+  const handleVolumeChange = useCallback((newVolume: number) => {
+    if (!player) return;
+    
+    const clampedVolume = clamp(newVolume, 0, 1);
+    player.setVolume(clampedVolume);
+    onVolumeChange?.(clampedVolume);
+  }, [player, onVolumeChange]);
+
+  const handleMuteToggle = useCallback(() => {
+    if (!player) return;
+    
+    const newMuted = !muted;
+    player.setMuted(newMuted);
+    onMuteToggle?.();
+  }, [player, muted, onMuteToggle]);
 
   const { ref, focused } = useFocusable({
     focusKey,
@@ -46,23 +62,7 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
     },
   });
 
-  const handleVolumeChange = (newVolume: number) => {
-    if (!player) return;
-    
-    const clampedVolume = clamp(newVolume, 0, 1);
-    player.setVolume(clampedVolume);
-    onVolumeChange?.(clampedVolume);
-  };
-
-  const handleMuteToggle = () => {
-    if (!player) return;
-    
-    const newMuted = !muted;
-    player.setMuted(newMuted);
-    onMuteToggle?.();
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     let percentage: number;
     
@@ -74,7 +74,7 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
     
     const newVolume = clamp(percentage, 0, 1);
     handleVolumeChange(newVolume);
-  };
+  }, [orientation, handleVolumeChange]);
 
   const VolumeIcon = () => {
     if (muted || volume === 0) {
@@ -169,4 +169,4 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
       )}
     </div>
   );
-};
+}, shallowEqual);

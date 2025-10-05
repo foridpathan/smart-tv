@@ -1,6 +1,6 @@
 import { useFocusable } from '@smart-tv/ui';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { usePlayer, usePlayerPlayback, usePlayerTime } from '../hooks/MediaContext';
+import { useBuffered, usePaused, usePlayerInstance, useTimeProgress } from '../hooks/useOptimizedHooks';
 import { SeekBarProps } from '../types';
 import { clamp, cn, formatTime } from '../utils';
 
@@ -14,9 +14,10 @@ const SeekBarComponent: React.FC<SeekBarProps> = ({
   onSeekStart,
   onSeekEnd,
 }) => {
-  const player = usePlayer();
-  const { currentTime, duration, buffered } = usePlayerTime();
-  const { paused } = usePlayerPlayback();
+  const player = usePlayerInstance();
+  const { currentTime, duration } = useTimeProgress();
+  const buffered = useBuffered();
+  const paused = usePaused();
   const [isDragging, setIsDragging] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
   const [showPreviewTooltip, setShowPreviewTooltip] = useState(false);

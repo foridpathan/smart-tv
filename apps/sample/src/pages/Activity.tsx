@@ -1,4 +1,4 @@
-import { AudioTrack, MediaProvider, PlayButton, SeekBar, TextTrack, VideoPlayer, VideoTrack } from '@smart-tv/player';
+import { AudioTrack, MediaProvider, PlayButton, PlayerControls, SeekBar, TextTrack, VideoPlayer, VideoTrack } from '@smart-tv/player';
 import { Screen } from '@smart-tv/ui';
 import { useCallback, useState } from 'react';
 
@@ -60,7 +60,11 @@ const Activity = () => {
                             onLoadedData={handlePlayerLoad}
                             onError={handlePlayerError}
                         />
-                        <div className="flex flex-col absolute bottom-4 left-4 right-4">
+                        <PlayerControls
+                            className=""
+                            style={{}}
+                        />
+                        {/* <div className="flex flex-col absolute bottom-4 left-4 right-4">
                             <div className="flex justify-between gap-4">
                                 <div className="">
                                     <PlayButton className='w-8' />
@@ -68,13 +72,12 @@ const Activity = () => {
                                 <div className="flex">
                                     <AudioTrack />
                                     <VideoTrack />
-                                    {/* <TextTrack /> */}
                                 </div>
                             </div>
                             <div className=" flex-1">
                                 <SeekBar className='w-full' />
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </MediaProvider>
 

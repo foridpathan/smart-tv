@@ -115,13 +115,13 @@ interface MediaContextValue {
 }
 
 // Create separate contexts to prevent unnecessary re-renders
-const TracksContext = createContext<{
+export const TracksContext = createContext<{
   audioTracks: AudioTrack[];
   videoTracks: VideoTrack[];
   textTracks: TextTrack[];
 } | null>(null);
 
-const PlayerContext = createContext<{
+export const PlayerContext = createContext<{
   player: MediaPlayerInstance | null;
   actions: {
     setCurrentTime: (time: number) => void;
@@ -143,13 +143,13 @@ const PlayerContext = createContext<{
   subscribe: (callback: (event: PlayerEvent) => void) => () => void;
 } | null>(null);
 
-const PlayerTimeContext = createContext<{
+export const PlayerTimeContext = createContext<{
   currentTime: number;
   duration: number;
   buffered: TimeRanges | null;
 } | null>(null);
 
-const PlayerPlaybackContext = createContext<{
+export const PlayerPlaybackContext = createContext<{
   paused: boolean;
   loading: boolean;
   ended: boolean;
@@ -157,12 +157,12 @@ const PlayerPlaybackContext = createContext<{
   waiting: boolean;
 } | null>(null);
 
-const PlayerVolumeContext = createContext<{
+export const PlayerVolumeContext = createContext<{
   volume: number;
   muted: boolean;
 } | null>(null);
 
-const PlayerDisplayContext = createContext<{
+export const PlayerDisplayContext = createContext<{
   fullscreen: boolean;
   pictureInPicture: boolean;
   playbackRate: number;

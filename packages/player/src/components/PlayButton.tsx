@@ -1,6 +1,6 @@
 import { useFocusable } from '@smart-tv/ui';
 import React, { memo } from 'react';
-import { usePlayer, usePlayerPlayback } from '../hooks/MediaContext';
+import { usePlaybackState, usePlayerInstance } from '../hooks/useOptimizedHooks';
 import { PlayButtonProps } from '../types';
 import { cn } from '../utils';
 
@@ -17,8 +17,8 @@ const PlayButtonComponent: React.FC<PlayButtonProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const player = usePlayer();
-  const { paused, loading } = usePlayerPlayback();
+  const player = usePlayerInstance();
+  const { paused, loading } = usePlaybackState();
 
   const { ref, focused } = useFocusable({
     focusKey,

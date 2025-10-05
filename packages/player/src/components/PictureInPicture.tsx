@@ -1,7 +1,7 @@
 import { useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
-import { cn } from '../utils';
+import React, { memo, useCallback } from 'react';
+import { usePictureInPicture, usePlayerInstance } from '../hooks/useOptimizedHooks';
+import { cn, shallowEqual } from '../utils';
 
 interface PictureInPictureProps {
   className?: string;
@@ -10,25 +10,20 @@ interface PictureInPictureProps {
   onToggle?: (isPip: boolean) => void;
 }
 
-export const PictureInPicture: React.FC<PictureInPictureProps> = ({
+const PictureInPictureComponent: React.FC<PictureInPictureProps> = ({
   className,
   style,
   focusKey = 'pip-button',
   onToggle,
 }) => {
-  const { state, player } = useMediaContext();
-  const { pictureInPicture } = state;
-
-  const { ref, focused } = useFocusable({
-    focusKey,
-    onEnterPress: handleToggle,
-  });
+  const player = usePlayerInstance();
+  const pictureInPicture = usePictureInPicture();
 
   // Check if PiP is supported
   const isPipSupported = typeof document !== 'undefined' && 
     'pictureInPictureEnabled' in document;
 
-  async function handleToggle() {
+  const handleToggle = useCallback(async () => {
     if (!player || !isPipSupported) return;
     
     try {
@@ -41,7 +36,12 @@ export const PictureInPicture: React.FC<PictureInPictureProps> = ({
     } catch (error) {
       console.warn('Picture-in-Picture toggle failed:', error);
     }
-  }
+  }, [player, pictureInPicture, onToggle, isPipSupported]);
+
+  const { ref, focused } = useFocusable({
+    focusKey,
+    onEnterPress: handleToggle,
+  });
 
   const PipIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="player-w-5 player-h-5">
@@ -75,3 +75,5 @@ export const PictureInPicture: React.FC<PictureInPictureProps> = ({
     </button>
   );
 };
+
+export const PictureInPicture = memo(PictureInPictureComponent, shallowEqual);
