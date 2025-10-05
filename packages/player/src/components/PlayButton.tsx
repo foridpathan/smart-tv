@@ -29,13 +29,13 @@ const PlayButtonComponent: React.FC<PlayButtonProps> = ({
 
   async function handlePress() {
     if (loading || !player) return;
-    
+
     if (paused) {
       await player.play();
     } else {
       player.pause();
     }
-    
+
     onClick?.();
   }
 
@@ -79,7 +79,7 @@ const PlayButtonComponent: React.FC<PlayButtonProps> = ({
       onClick={handlePress}
       disabled={loading}
     >
-      {showIcon && (
+      {showIcon && !loading && (
         <>
           {paused ? (
             playIcon || <DefaultPlayIcon />
@@ -88,9 +88,9 @@ const PlayButtonComponent: React.FC<PlayButtonProps> = ({
           )}
         </>
       )}
-      
+
       {loading && (
-  <div className="player-animate-spin player-rounded-full player-h-4 player-w-4 player-border-b-2 player-border-white" />
+        <div className="player-animate-spin player-rounded-full player-h-4 player-w-4 player-border-b-2 player-border-white" />
       )}
     </button>
   );

@@ -1,4 +1,4 @@
-import { AudioTrack, MediaProvider, PlayButton, PlayerControls, SeekBar, TextTrack, VideoPlayer, VideoTrack } from '@smart-tv/player';
+import { MediaProvider, PlayerControls, PlaylistState, VideoPlayer } from '@smart-tv/player';
 import { Screen } from '@smart-tv/ui';
 import { useCallback, useState } from 'react';
 
@@ -20,6 +20,46 @@ const videoSources = [
         title: "Big Buck Bunny (HLS)"
     }
 ];
+const playlistState: PlaylistState = {
+    currentItemId: 'video-1',
+    rails: [
+        {
+            id: 'queue',
+            title: 'Up Next',
+            type: 'related',
+            items: [
+                {
+                    id: 'video-1',
+                    title: 'Next Video',
+                    description: 'This video will play next',
+                    thumbnail: 'https://image.tmdb.org/t/p/original/ldLhsXf6sCFPi0FIIGgMT0njaZg.jpg',
+                    duration: 1800, // 30 minutes
+                    url: '/videos/video1.mp4',
+                    type: 'video'
+                }
+            ]
+        },
+        {
+            id: 'queue2',
+            title: 'Up Next',
+            type: 'related',
+            items: [
+                {
+                    id: 'video-1',
+                    title: 'Next Video',
+                    description: 'This video will play next',
+                    thumbnail: 'https://image.tmdb.org/t/p/original/ldLhsXf6sCFPi0FIIGgMT0njaZg.jpg',
+                    duration: 1800, // 30 minutes
+                    url: '/videos/video1.mp4',
+                    type: 'video'
+                }
+            ]
+        }
+    ],
+    isVisible: false,
+    expandedRails: [],
+    activeRail: 'queue'
+};
 
 const Activity = () => {
     const [currentVideo, setCurrentVideo] = useState(0);
@@ -63,6 +103,16 @@ const Activity = () => {
                         <PlayerControls
                             className=""
                             style={{}}
+                            playlist={{
+                                state: playlistState,
+                                config: { autoPlay: true },
+                                callbacks: {
+                                    onItemPlay: (item) => {
+                                        console.log('Playing:', item.title);
+                                        // Handle video change
+                                    }
+                                }
+                            }}
                         />
                         {/* <div className="flex flex-col absolute bottom-4 left-4 right-4">
                             <div className="flex justify-between gap-4">

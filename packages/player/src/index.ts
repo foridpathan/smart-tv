@@ -15,6 +15,14 @@ export { TextTrack } from "./components/TextTrack";
 export { TrackSelector } from "./components/TrackSelector";
 export { VideoTrack } from "./components/VideoTrack";
 
+// Playlist components
+export { AutoPlayCountdown } from "./components/AutoPlayCountdown";
+export { Playlist } from "./components/Playlist";
+export { PlaylistButton } from "./components/PlaylistButton";
+export { PlaylistItem } from "./components/PlaylistItem";
+export { PlaylistManager } from "./components/PlaylistManager";
+export { PlaylistRail } from "./components/PlaylistRail";
+
 // Hooks and context
 export {
     MediaProvider,
@@ -28,6 +36,15 @@ export {
     usePlayerVolume,
     useTracks
 } from "./hooks/MediaContext";
+
+// Playlist hooks and context
+export {
+    PlaylistProvider,
+    usePlaylist,
+    usePlaylistActions,
+    usePlaylistHelpers,
+    usePlaylistState
+} from "./hooks/PlaylistContext";
 
 // Optimized hooks to prevent unnecessary re-renders
 export {
@@ -63,6 +80,11 @@ export type {
     PlayerEventType,
     PlayerSource,
     PlayerState,
+    PlaylistCallbacks,
+    PlaylistConfig,
+    PlaylistItem as PlaylistItemType,
+    PlaylistRail as PlaylistRailType,
+    PlaylistState,
     SeekBarProps,
     TextTrack as TextTrackType,
     TrackSelectorProps,

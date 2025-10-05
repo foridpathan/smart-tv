@@ -6,6 +6,9 @@ import { cn, formatTime } from '../utils';
 import { Fullscreen } from './Fullscreen';
 import { PictureInPicture } from './PictureInPicture';
 import { PlayButton } from './PlayButton';
+import { Playlist } from './Playlist';
+import { PlaylistButton } from './PlaylistButton';
+import { PlaylistManager } from './PlaylistManager';
 import { SeekBar } from './SeekBar';
 import { TrackSelector } from './TrackSelector';
 
@@ -26,11 +29,14 @@ const PlayerControlsComponent: React.FC<PlayerControlsProps> = ({
   autoHideDelay = 4000,
   focusKey = 'player-controls',
   children,
+  playlist,
+  showPlaylist = false,
 }) => {
   // Only subscribe to the specific state we need
   const paused = usePaused();
 
   const [isVisible, setIsVisible] = useState(true);
+  const [isPlaylistVisible, setIsPlaylistVisible] = useState(showPlaylist);
   const [showTrackSelector, setShowTrackSelector] = useState(false);
   const [trackSelectorType, setTrackSelectorType] = useState<'audio' | 'video' | 'text'>('audio');
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -152,6 +158,35 @@ const PlayerControlsComponent: React.FC<PlayerControlsProps> = ({
   return (
     <FocusContext.Provider value={buttonFocusKey}>
       <div className="player-absolute player-inset-0 player-pointer-events-none">
+        {/* Playlist Component */}
+        {playlist && isPlaylistVisible && (
+          <Playlist
+            state={{ ...playlist.state, isVisible: isPlaylistVisible }}
+            config={playlist.config}
+            callbacks={playlist.callbacks}
+            focusKey="youtube-playlist"
+            onClose={() => setIsPlaylistVisible(false)}
+          />
+        )}
+
+        {/* Playlist Manager for auto-play and DRM handling */}
+        {playlist && (
+          <PlaylistManager
+            state={playlist.state}
+            config={playlist.config}
+            callbacks={playlist.callbacks}
+            onItemChange={(item) => {
+              // This would typically update the video source
+              // You might need to pass this handler from parent component
+              console.log('Changing to item:', item.title);
+            }}
+            onDrmConfigChange={(drm) => {
+              // Handle DRM configuration changes
+              console.log('DRM config changed:', drm);
+            }}
+          />
+        )}
+
         {/* YouTube-style Controls */}
         <div
           ref={ref}
@@ -196,6 +231,17 @@ const PlayerControlsComponent: React.FC<PlayerControlsProps> = ({
 
               {/* Right Side - Settings & Features */}
               <div className="player-flex player-items-center player-gap-2">
+                {/* Playlist Button */}
+                {playlist && (
+                  <PlaylistButton
+                    focusKey="youtube-playlist-button"
+                    isActive={isPlaylistVisible}
+                    itemCount={playlist.state.rails.reduce((total, rail) => total + rail.items.length, 0)}
+                    onClick={() => setIsPlaylistVisible(!isPlaylistVisible)}
+                    className='player-rounded-full'
+                  />
+                )}
+
                 {/* Quality Button */}
                 <ControlButton
                   focusKey="youtube-quality-button"
@@ -230,10 +276,10 @@ const PlayerControlsComponent: React.FC<PlayerControlsProps> = ({
                 </ControlButton>
 
                 {/* Picture in Picture */}
-                <PictureInPicture focusKey="youtube-pip-button" />
+                <PictureInPicture className='player-rounded-full' focusKey="youtube-pip-button" />
 
                 {/* Fullscreen */}
-                <Fullscreen focusKey="youtube-fullscreen-button" />
+                <Fullscreen className='player-rounded-full' focusKey="youtube-fullscreen-button" />
               </div>
             </div>
           </div>

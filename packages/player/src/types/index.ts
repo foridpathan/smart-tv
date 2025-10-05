@@ -82,6 +82,7 @@ export interface MediaPlayerProps {
   playbackRate?: number;
   crossOrigin?: 'anonymous' | 'use-credentials';
   preload?: 'none' | 'metadata' | 'auto';
+  children?: ReactNode;
   onReady?: () => void;
   onPlay?: () => void;
   onPause?: () => void;
@@ -113,6 +114,13 @@ export interface PlayerControlsProps {
   autoHideDelay?: number;
   focusKey?: string;
   children?: ReactNode;
+  // Playlist configuration
+  playlist?: {
+    state: PlaylistState;
+    config?: PlaylistConfig;
+    callbacks?: PlaylistCallbacks;
+  };
+  showPlaylist?: boolean;
 }
 
 export interface PlayButtonProps {
@@ -221,4 +229,101 @@ export interface PlayerEvent {
   type: PlayerEventType;
   target: MediaPlayerInstance;
   data?: any;
+}
+
+// Playlist types
+export interface PlaylistItem {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  duration?: number;
+  url: string;
+  type?: 'video' | 'audio';
+  metadata?: Record<string, any>;
+  isActive?: boolean;
+  progress?: number; // 0-100
+  // DRM configuration for this specific item
+  drm?: DrmConfig;
+  // Custom headers for this item
+  headers?: Record<string, string>;
+  // Subtitles/captions for this item
+  subtitles?: Array<{
+    url: string;
+    language: string;
+    label: string;
+    isDefault?: boolean;
+  }>;
+  // Quality levels available for this item
+  qualities?: Array<{
+    url: string;
+    label: string;
+    width?: number;
+    height?: number;
+    bandwidth?: number;
+  }>;
+}
+
+export interface PlaylistRail {
+  id: string;
+  title: string;
+  type: 'queue' | 'related' | 'recommendations' | 'history' | 'custom';
+  items: PlaylistItem[];
+  isCollapsible?: boolean;
+  isCollapsed?: boolean;
+  maxVisible?: number;
+  priority?: number; // for ordering rails
+}
+
+export interface PlaylistState {
+  currentItemId?: string;
+  rails: PlaylistRail[];
+  isVisible: boolean;
+  expandedRails: string[];
+  activeRail?: string;
+  // Auto-play state
+  autoPlayEnabled?: boolean;
+  autoPlayCountdown?: number; // seconds
+  nextItemId?: string;
+}
+
+export interface PlaylistConfig {
+  showThumbnails?: boolean;
+  showDuration?: boolean;
+  showProgress?: boolean;
+  maxRailHeight?: number;
+  itemsPerRow?: number;
+  autoPlay?: boolean;
+  autoPlayDelay?: number; // seconds before auto-playing next item (default: 5)
+  autoPlayCountdown?: boolean; // show countdown timer
+  loop?: boolean;
+  shuffle?: boolean;
+  saveHistory?: boolean;
+  // DRM configuration
+  globalDrm?: DrmConfig; // Global DRM config applied to all items without specific DRM
+  drmFallback?: boolean; // Try to play without DRM if DRM fails
+  // Quality settings
+  preferredQuality?: 'auto' | 'highest' | 'lowest' | string;
+  adaptiveStreaming?: boolean;
+  // Preload settings
+  preloadNext?: boolean; // Preload the next item in queue
+  preloadCount?: number; // Number of items to preload (default: 1)
+}
+
+export interface PlaylistCallbacks {
+  onItemSelect?: (item: PlaylistItem) => void;
+  onItemPlay?: (item: PlaylistItem) => void;
+  onItemEnd?: (item: PlaylistItem) => void; // Called when an item finishes playing
+  onAutoPlayStart?: (nextItem: PlaylistItem, countdown: number) => void;
+  onAutoPlayCancel?: (nextItem: PlaylistItem) => void;
+  onDrmError?: (item: PlaylistItem, error: Error) => void;
+  onQualityChange?: (item: PlaylistItem, quality: string) => void;
+  onRailExpand?: (railId: string) => void;
+  onRailCollapse?: (railId: string) => void;
+  onLoadMore?: (railId: string) => Promise<PlaylistItem[]>;
+  // Navigation callbacks
+  onNext?: () => PlaylistItem | undefined;
+  onPrevious?: () => PlaylistItem | undefined;
+  onGetNextItem?: (currentItemId: string) => PlaylistItem | undefined;
+  onGetPreviousItem?: (currentItemId: string) => PlaylistItem | undefined;
 }
