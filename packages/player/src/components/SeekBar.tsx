@@ -1,10 +1,10 @@
 import { useFocusable } from '@smart-tv/ui';
-import React, { useEffect, useRef, useState } from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import { usePlayer, usePlayerPlayback, usePlayerTime } from '../hooks/MediaContext';
 import { SeekBarProps } from '../types';
 import { clamp, cn, formatTime } from '../utils';
 
-export const SeekBar: React.FC<SeekBarProps> = ({
+const SeekBarComponent: React.FC<SeekBarProps> = ({
   className,
   style,
   focusKey = 'seek-bar',
@@ -14,8 +14,9 @@ export const SeekBar: React.FC<SeekBarProps> = ({
   onSeekStart,
   onSeekEnd,
 }) => {
-  const { state, player } = useMediaContext();
-  const { currentTime, duration, buffered } = state;
+  const player = usePlayer();
+  const { currentTime, duration, buffered } = usePlayerTime();
+  const { paused } = usePlayerPlayback();
   const [isDragging, setIsDragging] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
   const [showPreviewTooltip, setShowPreviewTooltip] = useState(false);
@@ -33,7 +34,7 @@ export const SeekBar: React.FC<SeekBarProps> = ({
     onEnterPress: () => {
       // Toggle play/pause on enter
       if (player) {
-        if (state.paused) {
+        if (paused) {
           player.play();
         } else {
           player.pause();
@@ -202,3 +203,6 @@ export const SeekBar: React.FC<SeekBarProps> = ({
     </div>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const SeekBar = memo(SeekBarComponent);

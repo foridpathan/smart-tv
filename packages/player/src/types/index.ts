@@ -16,6 +16,9 @@ export interface PlayerState {
   playbackRate: number;
   seeking: boolean;
   waiting: boolean;
+  audioTracks: AudioTrack[];
+  videoTracks: VideoTrack[];
+  textTracks: TextTrack[];
 }
 
 // Track types

@@ -17,7 +17,9 @@
     "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --no-layer",
     "build:components": "tsup",
     "build": "pnpm run build:components & pnpm run build:styles",
-    "dev": "tsup --watch",
+    "dev:styles": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch",
+    "dev:components": "tsup --watch",
+    "dev": "pnpm run dev:components & pnpm run dev:styles",
     "check-types": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "clean": "rm -rf dist"

@@ -1,4 +1,4 @@
-import { useFocusable } from '@smart-tv/ui';
+import { FocusContext, useFocusable } from '@smart-tv/ui';
 import React from 'react';
 import { useMediaContext } from '../hooks/MediaContext';
 import { VideoTrack as VideoTrackType } from '../types';
@@ -16,8 +16,8 @@ export const VideoTrack: React.FC<VideoTrackProps> = ({
   onClose,
 }) => {
   const { player, videoTracks } = useMediaContext();
-  
-  const { ref } = useFocusable({
+
+  const { ref, focusKey } = useFocusable({
     focusKey: 'video-track-selector',
     trackChildren: true,
   });
@@ -48,38 +48,40 @@ export const VideoTrack: React.FC<VideoTrackProps> = ({
   };
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        'player-bg-black player-bg-opacity-80 player-text-white player-p-6 player-rounded-lg player-min-w-80',
-        className
-      )}
-    >
-      <div className="player-mb-4">
-        <h3 className="player-text-xl player-font-semibold">Video Quality</h3>
-      </div>
-      
-  <div className="player-space-y-2">
-        {/* Auto quality option */}
-        <VideoTrackItem
-          track={null}
-          focusKey="video-track-auto"
-          isSelected={!sortedTracks.some(track => track.active)}
-          onSelect={handleAutoQuality}
-          label="Auto"
-        />
-        
-        {sortedTracks.map((track, index) => (
+    <FocusContext.Provider value={focusKey}>
+      <div
+        ref={ref}
+        className={cn(
+          'player-bg-black player-bg-opacity-80 player-text-white player-p-6 player-rounded-lg player-min-w-80',
+          className
+        )}
+      >
+        <div className="player-mb-4">
+          <h3 className="player-text-xl player-font-semibold">Video Quality</h3>
+        </div>
+
+        <div className="player-space-y-2">
+          {/* Auto quality option */}
           <VideoTrackItem
-            key={track.id}
-            track={track}
-            focusKey={`video-track-${index}`}
-            isSelected={track.active}
-            onSelect={() => handleTrackSelect(track)}
+            track={null}
+            focusKey="video-track-auto"
+            isSelected={!sortedTracks.some(track => track.active)}
+            onSelect={handleAutoQuality}
+            label="Auto"
           />
-        ))}
+
+          {sortedTracks.map((track, index) => (
+            <VideoTrackItem
+              key={track.id}
+              track={track}
+              focusKey={`video-track-${index}`}
+              isSelected={track.active}
+              onSelect={() => handleTrackSelect(track)}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </FocusContext.Provider>
   );
 };
 
@@ -106,10 +108,10 @@ const VideoTrackItem: React.FC<VideoTrackItemProps> = ({
   const getQualityLabel = () => {
     if (label) return label;
     if (!track) return 'Auto';
-    
+
     const quality = track.height ? `${track.height}p` : 'Unknown';
     const bandwidth = track.bandwidth ? `${Math.round(track.bandwidth / 1000)}kbps` : '';
-    
+
     return bandwidth ? `${quality} (${bandwidth})` : quality;
   };
 
@@ -117,10 +119,10 @@ const VideoTrackItem: React.FC<VideoTrackItemProps> = ({
     <div
       ref={ref}
       className={cn(
-        'flex items-center justify-between p-3 rounded cursor-pointer transition-colors',
-        'hover:bg-white hover:bg-opacity-10',
-        focused && 'bg-blue-600',
-        isSelected && 'bg-green-600'
+        'player-flex player-items-center player-justify-between player-p-3 player-rounded player-cursor-pointer player-transition-colors',
+        'hover:player-bg-white hover:player-bg-opacity-10',
+        focused && 'player-bg-blue-600',
+        isSelected && 'player-bg-green-600'
       )}
       onClick={onSelect}
     >

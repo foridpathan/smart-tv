@@ -1,10 +1,10 @@
 import { useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
+import React, { memo } from 'react';
+import { usePlayer, usePlayerPlayback } from '../hooks/MediaContext';
 import { PlayButtonProps } from '../types';
 import { cn } from '../utils';
 
-export const PlayButton: React.FC<PlayButtonProps> = ({
+const PlayButtonComponent: React.FC<PlayButtonProps> = ({
   className,
   style,
   focusKey = 'play-button',
@@ -17,8 +17,8 @@ export const PlayButton: React.FC<PlayButtonProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const { state, player } = useMediaContext();
-  const { paused, loading } = state;
+  const player = usePlayer();
+  const { paused, loading } = usePlayerPlayback();
 
   const { ref, focused } = useFocusable({
     focusKey,
@@ -95,3 +95,6 @@ export const PlayButton: React.FC<PlayButtonProps> = ({
     </button>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const PlayButton = memo(PlayButtonComponent);

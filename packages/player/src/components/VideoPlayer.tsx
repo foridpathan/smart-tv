@@ -14,7 +14,7 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
     const {
       src,
       poster,
-      autoPlay = false,
+      autoPlay = true,
       loop = false,
       muted = false,
       controls = false,
@@ -49,11 +49,15 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerRef = useRef<shaka.Player | null>(null);
-    const mediaContextRef = useRef<any>(null);
+    const lastTimeUpdateRef = useRef<number>(0);
+    
+    // Throttle time updates to prevent excessive re-renders (update at most every 100ms)
+    const TIME_UPDATE_THROTTLE = 100;
     
     // Get media context if available
+    let mediaContext: any = null;
     try {
-      mediaContextRef.current = useMediaContext();
+      mediaContext = useMediaContext();
     } catch {
       // Context not available, that's okay
     }
@@ -222,6 +226,12 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
           const track = variants.find((v: any) => v.audioId?.toString() === trackId);
           if (track) {
             playerRef.current.selectAudioLanguage(track.language, track.roles?.[0]);
+            // Refresh tracks after selection to update active state
+            // Use setTimeout to ensure Shaka Player has updated its internal state
+            setTimeout(() => {
+              const updatedTracks = this.getAudioTracks();
+              mediaContext?.setAudioTracks?.(updatedTracks);
+            }, 0);
           }
         }
       },
@@ -232,6 +242,12 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
           const track = variants.find((v: any) => v.videoId?.toString() === trackId);
           if (track) {
             playerRef.current.selectVariantTrack(track, true);
+            // Refresh tracks after selection to update active state
+            // Use setTimeout to ensure Shaka Player has updated its internal state
+            setTimeout(() => {
+              const updatedTracks = this.getVideoTracks();
+              mediaContext?.setVideoTracks?.(updatedTracks);
+            }, 0);
           }
         }
       },
@@ -242,6 +258,12 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
           const track = textTracks.find((t: any) => t.id === trackId);
           if (track) {
             playerRef.current.selectTextTrack(track);
+            // Refresh tracks after selection to update active state
+            // Use setTimeout to ensure Shaka Player has updated its internal state
+            setTimeout(() => {
+              const updatedTracks = this.getTextTracks();
+              mediaContext?.setTextTracks?.(updatedTracks);
+            }, 0);
           }
         }
       },
@@ -269,7 +291,7 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
       player.addEventListener('error', (event: any) => {
         const error = new Error(event.detail?.message || 'Shaka Player error');
         onError?.(error);
-        mediaContextRef.current?.actions.setError(error);
+        mediaContext?.actions.setError(error);
       });
 
       // Set up track change events
@@ -277,16 +299,16 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
         onTracksChange?.();
         
         // Update context with new tracks
-        if (mediaContextRef.current) {
-          mediaContextRef.current.setAudioTracks(playerInstance.getAudioTracks());
-          mediaContextRef.current.setVideoTracks(playerInstance.getVideoTracks());
-          mediaContextRef.current.setTextTracks(playerInstance.getTextTracks());
+        if (mediaContext) {
+          mediaContext.setAudioTracks(playerInstance.getAudioTracks());
+          mediaContext.setVideoTracks(playerInstance.getVideoTracks());
+          mediaContext.setTextTracks(playerInstance.getTextTracks());
         }
       });
 
       // Call onReady
       onReady?.();
-      mediaContextRef.current?.setPlayer(playerInstance);
+      mediaContext?.setPlayer(playerInstance);
 
       return () => {
         player.destroy();
@@ -304,7 +326,7 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
             throw new Error('Player not initialized');
           }
 
-          mediaContextRef.current?.actions.setLoading(true);
+          mediaContext?.actions.setLoading(true);
           
           if (typeof src === 'string') {
             await playerRef.current.load(src);
@@ -323,13 +345,13 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
           }
           
           onLoadedData?.();
-          mediaContextRef.current?.actions.setLoading(false);
-          mediaContextRef.current?.actions.setError(null);
+          mediaContext?.actions.setLoading(false);
+          mediaContext?.actions.setError(null);
         } catch (error) {
           const err = error instanceof Error ? error : new Error('Failed to load source');
           onError?.(err);
-          mediaContextRef.current?.actions.setError(err);
-          mediaContextRef.current?.actions.setLoading(false);
+          mediaContext?.actions.setError(err);
+          mediaContext?.actions.setLoading(false);
         }
       };
 
@@ -345,80 +367,86 @@ export const VideoPlayer = forwardRef<MediaPlayerInstance, MediaPlayerProps>(
 
       const handlePlay = () => {
         onPlay?.();
-        mediaContextRef.current?.actions.setPaused(false);
+        mediaContext?.actions.setPaused(false);
       };
 
       const handlePause = () => {
         onPause?.();
-        mediaContextRef.current?.actions.setPaused(true);
+        mediaContext?.actions.setPaused(true);
       };
 
       const handleEnded = () => {
         onEnded?.();
-        mediaContextRef.current?.actions.setEnded(true);
+        mediaContext?.actions.setEnded(true);
       };
 
       const handleTimeUpdate = () => {
         const currentTime = video.currentTime;
-        onTimeUpdate?.(currentTime);
-        mediaContextRef.current?.actions.setCurrentTime(currentTime);
+        const now = Date.now();
+        
+        // Throttle time updates to prevent excessive re-renders
+        if (now - lastTimeUpdateRef.current >= TIME_UPDATE_THROTTLE) {
+          onTimeUpdate?.(currentTime);
+          mediaContext?.actions.setCurrentTime(currentTime);
+          lastTimeUpdateRef.current = now;
+        }
       };
 
       const handleDurationChange = () => {
         const duration = video.duration;
         onDurationChange?.(duration);
-        mediaContextRef.current?.actions.setDuration(duration);
+        mediaContext?.actions.setDuration(duration);
       };
 
       const handleVolumeChange = () => {
         const volume = video.volume;
         const muted = video.muted;
         onVolumeChange?.(volume);
-        mediaContextRef.current?.actions.setVolume(volume);
-        mediaContextRef.current?.actions.setMuted(muted);
+        mediaContext?.actions.setVolume(volume);
+        mediaContext?.actions.setMuted(muted);
       };
 
       const handleProgress = () => {
         onProgress?.(video.buffered);
-        mediaContextRef.current?.actions.setBuffered(video.buffered);
+        mediaContext?.actions.setBuffered(video.buffered);
       };
 
       const handleSeeking = () => {
         onSeeking?.();
-        mediaContextRef.current?.actions.setSeeking(true);
+        mediaContext?.actions.setSeeking(true);
       };
 
       const handleSeeked = () => {
         onSeeked?.();
-        mediaContextRef.current?.actions.setSeeking(false);
+        mediaContext?.actions.setSeeking(false);
       };
 
       const handleWaiting = () => {
         onWaiting?.();
-        mediaContextRef.current?.actions.setWaiting(true);
+        mediaContext?.actions.setWaiting(true);
       };
 
       const handleCanPlay = () => {
         onCanPlay?.();
-        mediaContextRef.current?.actions.setWaiting(false);
+        mediaContext?.actions.setWaiting(false);
       };
 
       const handleRateChange = () => {
         const rate = video.playbackRate;
         onPlaybackRateChange?.(rate);
-        mediaContextRef.current?.actions.setPlaybackRate(rate);
+        mediaContext?.actions.setPlaybackRate(rate);
       };
 
       const handleFullscreenChange = () => {
         const isFullscreen = !!document.fullscreenElement;
         onFullscreenChange?.(isFullscreen);
-        mediaContextRef.current?.actions.setFullscreen(isFullscreen);
+        mediaContext?.actions.setFullscreen(isFullscreen);
       };
 
       const handlePipChange = () => {
         const isPip = !!(document as any).pictureInPictureElement;
         onPictureInPictureChange?.(isPip);
-        mediaContextRef.current?.actions.setPictureInPicture(isPip);
+        mediaContext?.actions.setPictureInPicture(isPip);
       };
 
       // Add event listeners

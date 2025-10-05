@@ -10,24 +10,24 @@ export { SeekBar } from "./components/SeekBar";
 export { VolumeControl } from "./components/VolumeControl";
 
 // Track components
-export { AudioTrack as AudioTrackSelector } from "./components/AudioTrack";
-export { TextTrack as TextTrackSelector } from "./components/TextTrack";
+export { AudioTrack } from "./components/AudioTrack";
+export { TextTrack } from "./components/TextTrack";
 export { TrackSelector } from "./components/TrackSelector";
-export { VideoTrack as VideoTrackSelector } from "./components/VideoTrack";
+export { VideoTrack } from "./components/VideoTrack";
 
 // Hooks and context
 export {
     MediaProvider,
     useMediaContext,
     usePlayer,
-    usePlayerActions,
-    usePlayerState,
-    useTracks
+    usePlayerActions, usePlayerDisplay,
+    usePlayerPlayback, usePlayerState, usePlayerTime,
+    usePlayerVolume, useTracks
 } from "./hooks/MediaContext";
 
 // Types
 export type {
-    AudioTrack,
+    AudioTrack as AudioTrackType,
     DrmConfig,
     MediaPlayerInstance,
     MediaPlayerProps,
@@ -38,9 +38,9 @@ export type {
     PlayerSource,
     PlayerState,
     SeekBarProps,
-    TextTrack,
+    TextTrack as TextTrackType,
     TrackSelectorProps,
-    VideoTrack,
+    VideoTrack as VideoTrackType,
     VolumeControlProps
 } from "./types";
 

@@ -1,40 +1,40 @@
-import { MediaProvider, PlayButton, SeekBar, VideoPlayer } from '@smart-tv/player';
+import { AudioTrack, MediaProvider, PlayButton, SeekBar, TextTrack, VideoPlayer, VideoTrack } from '@smart-tv/player';
 import { Screen } from '@smart-tv/ui';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+
+// Sample video sources for testing - moved outside component to prevent recreation
+const videoSources = [
+    {
+        src: "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8",
+        poster: "https://storage.googleapis.com/shaka-demo-assets/angel-one/poster.jpg",
+        title: "Angel One (HLS)"
+    },
+    {
+        src: "https://storage.googleapis.com/shaka-demo-assets/sintel/dash.mpd",
+        poster: "https://storage.googleapis.com/shaka-demo-assets/sintel/poster.jpg",
+        title: "Sintel (DASH)"
+    },
+    {
+        src: "https://storage.googleapis.com/shaka-demo-assets/big-buck-bunny/index.m3u8",
+        poster: "https://storage.googleapis.com/shaka-demo-assets/big-buck-bunny/poster.jpg",
+        title: "Big Buck Bunny (HLS)"
+    }
+];
 
 const Activity = () => {
     const [currentVideo, setCurrentVideo] = useState(0);
-    
-    // Sample video sources for testing
-    const videoSources = [
-        {
-            src: "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8",
-            poster: "https://storage.googleapis.com/shaka-demo-assets/angel-one/poster.jpg",
-            title: "Angel One (HLS)"
-        },
-        {
-            src: "https://storage.googleapis.com/shaka-demo-assets/sintel/dash.mpd",
-            poster: "https://storage.googleapis.com/shaka-demo-assets/sintel/poster.jpg",
-            title: "Sintel (DASH)"
-        },
-        {
-            src: "https://storage.googleapis.com/shaka-demo-assets/big-buck-bunny/index.m3u8",
-            poster: "https://storage.googleapis.com/shaka-demo-assets/big-buck-bunny/poster.jpg",
-            title: "Big Buck Bunny (HLS)"
-        }
-    ];
 
-    const handleVideoChange = (index: number) => {
+    const handleVideoChange = useCallback((index: number) => {
         setCurrentVideo(index);
-    };
+    }, []);
 
-    const handlePlayerLoad = () => {
+    const handlePlayerLoad = useCallback(() => {
         console.log(`${videoSources[currentVideo].title} loaded successfully`);
-    };
+    }, [currentVideo, videoSources]);
 
-    const handlePlayerError = (error: Error) => {
+    const handlePlayerError = useCallback((error: Error) => {
         console.error(`Player error for ${videoSources[currentVideo].title}:`, error);
-    };
+    }, [currentVideo, videoSources]);
 
     return (
         <Screen>
@@ -50,7 +50,7 @@ const Activity = () => {
                 {/* Video Player */}
                 <MediaProvider>
                     <div className="relative w-full h-[70vh] bg-black">
-                        <VideoPlayer 
+                        <VideoPlayer
                             key={currentVideo} // Force re-render when video changes
                             src={videoSources[currentVideo].src}
                             autoPlay={true}
@@ -61,8 +61,15 @@ const Activity = () => {
                             onError={handlePlayerError}
                         />
                         <div className="flex flex-col absolute bottom-4 left-4 right-4">
-                            <div className="flex gap-4">
-                                <PlayButton className='w-8' />
+                            <div className="flex justify-between gap-4">
+                                <div className="">
+                                    <PlayButton className='w-8' />
+                                </div>
+                                <div className="flex">
+                                    <AudioTrack />
+                                    <VideoTrack />
+                                    {/* <TextTrack /> */}
+                                </div>
                             </div>
                             <div className=" flex-1">
                                 <SeekBar className='w-full' />
@@ -80,8 +87,8 @@ const Activity = () => {
                                 key={index}
                                 className={`
                                     p-4 rounded-lg border-2 cursor-pointer transition-all
-                                    ${currentVideo === index 
-                                        ? 'border-blue-500 bg-blue-500 bg-opacity-20' 
+                                    ${currentVideo === index
+                                        ? 'border-blue-500 bg-blue-500 bg-opacity-20'
                                         : 'border-gray-600 hover:border-gray-400 bg-gray-800'
                                     }
                                 `}

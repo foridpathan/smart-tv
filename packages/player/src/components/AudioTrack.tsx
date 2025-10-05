@@ -1,22 +1,29 @@
-import { useFocusable } from '@smart-tv/ui';
-import React from 'react';
-import { useMediaContext } from '../hooks/MediaContext';
+import { FocusContext, useFocusable } from '@smart-tv/ui';
+import React, { memo } from 'react';
+import { usePlayer, useTracks } from '../hooks/MediaContext';
 import { AudioTrack as AudioTrackType } from '../types';
 import { cn, getDisplayLanguage } from '../utils';
 
 interface AudioTrackProps {
   className?: string;
+  itemClass?: string
+  focusClass?: string
+  selectedClass?: string
   onTrackSelect?: (track: AudioTrackType) => void;
   onClose?: () => void;
 }
 
-export const AudioTrack: React.FC<AudioTrackProps> = ({
+const AudioTrackComponent: React.FC<AudioTrackProps> = ({
   className,
   onTrackSelect,
   onClose,
+  itemClass,
+  selectedClass,
+  focusClass
 }) => {
-  const { player, audioTracks } = useMediaContext();
-  
+  const player = usePlayer();
+  const { audioTracks } = useTracks();
+
   const { ref, focusKey } = useFocusable({
     focusKey: 'audio-track-selector',
     trackChildren: true,
@@ -31,33 +38,45 @@ export const AudioTrack: React.FC<AudioTrackProps> = ({
   };
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        'player-bg-black player-bg-opacity-80 player-text-white player-p-6 player-rounded-lg player-min-w-80',
-        className
-      )}
-    >
-      <div className="player-mb-4">
-        <h3 className="player-text-xl player-font-semibold">Audio Language</h3>
+    <FocusContext.Provider value={focusKey}>
+      <div
+        ref={ref}
+        className={cn(
+          'player-bg-black player-bg-opacity-80 player-text-white player-p-6 player-rounded-lg player-min-w-80',
+          className,
+          Math.random().toString()
+        )}
+      >
+        <div className="player-mb-4">
+          <h3 className="player-text-xl player-font-semibold">Audio Language</h3>
+        </div>
+
+        <div className="player-space-y-2">
+          {audioTracks.map((track, index) => (
+            <AudioTrackItem
+              key={track.id}
+              track={track}
+              focusKey={`audio-track-${index}`}
+              isSelected={track.active}
+              onSelect={() => handleTrackSelect(track)}
+              className={itemClass}
+              focusClass={focusClass}
+              selectedClass={selectedClass}
+            />
+          ))}
+        </div>
       </div>
-      
-      <div className="player-space-y-2">
-        {audioTracks.map((track, index) => (
-          <AudioTrackItem
-            key={track.id}
-            track={track}
-            focusKey={`audio-track-${index}`}
-            isSelected={track.active}
-            onSelect={() => handleTrackSelect(track)}
-          />
-        ))}
-      </div>
-    </div>
+    </FocusContext.Provider>
   );
 };
 
+// Export memoized component to prevent unnecessary re-renders
+export const AudioTrack = memo(AudioTrackComponent);
+
 interface AudioTrackItemProps {
+  className?: string
+  focusClass?: string
+  selectedClass?: string
   track: AudioTrackType;
   focusKey: string;
   isSelected: boolean;
@@ -69,6 +88,9 @@ const AudioTrackItem: React.FC<AudioTrackItemProps> = ({
   focusKey,
   isSelected,
   onSelect,
+  className,
+  focusClass,
+  selectedClass
 }) => {
   const { ref, focused } = useFocusable({
     focusKey,
@@ -79,10 +101,11 @@ const AudioTrackItem: React.FC<AudioTrackItemProps> = ({
     <div
       ref={ref}
       className={cn(
-        'flex items-center justify-between p-3 rounded cursor-pointer transition-colors',
-        'hover:bg-white hover:bg-opacity-10',
-        focused && 'bg-blue-600',
-        isSelected && 'bg-green-600'
+        'player-flex player-items-center player-justify-between player-p-3 player-rounded player-cursor-pointer player-transition-colors',
+        'player-hover:bg-white player-hover:bg-opacity-10',
+        className,
+        focused && (focusClass || 'player-bg-blue-600'),
+        isSelected && (selectedClass || 'player-bg-green-600')
       )}
       onClick={onSelect}
     >
