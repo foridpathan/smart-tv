@@ -1,0 +1,174 @@
+declare module 'shaka-player' {
+  export = shaka;
+  export as namespace shaka;
+  
+  namespace shaka {
+    export class Player {
+      constructor(video: HTMLVideoElement);
+      load(uri: string): Promise<void>;
+      destroy(): Promise<void>;
+      configure(config: any): void;
+      getConfiguration(): any;
+      getVariantTracks(): any[];
+      getTextTracks(): any[];
+      selectAudioLanguage(language: string, role?: string): void;
+      selectVariantTrack(track: any, clearBuffer?: boolean): void;
+      selectTextTrack(track: any): void;
+      setTextTrackVisibility(visible: boolean): void;
+      getStats(): any;
+      getPlaybackRate(): number;
+      setPlaybackRate(rate: number): void;
+      getCurrentTime(): number;
+      getDuration(): number;
+      addEventListener(type: string, listener: EventListener): void;
+      removeEventListener(type: string, listener: EventListener): void;
+    }
+    
+    export namespace polyfill {
+      export function installAll(): void;
+    }
+    
+    export namespace util {
+      export namespace Error {
+        export const Code: {
+          UNSUPPORTED_SCHEME: number;
+          BAD_HTTP_STATUS: number;
+          HTTP_ERROR: number;
+          TIMEOUT: number;
+          MALFORMED_DATA_URI: number;
+          UNKNOWN_DATA_URI_ENCODING: number;
+          REQUEST_FILTER_ERROR: number;
+          RESPONSE_FILTER_ERROR: number;
+          MALFORMED_XML: number;
+          NETWORK_ERROR: number;
+          ATTEMPT_FAILED: number;
+          CRITICAL_ERROR: number;
+          CHUNK_DEMUXER_ERROR: number;
+          INVALID_CHUNKED_DATA: number;
+          QUOTA_EXCEEDED_ERROR: number;
+          OPERATION_ABORTED: number;
+          UNSUPPORTED_OPERATION: number;
+          LOAD_INTERRUPTED: number;
+          CAST_UNAVAILABLE: number;
+          CAST_CANCELED: number;
+          CAST_RECEIVER_APP_UNAVAILABLE: number;
+          STORAGE_NOT_SUPPORTED: number;
+          INDEXED_DB_ERROR: number;
+          DEPRECATED_OPERATION: number;
+          UNREACHABLE: number;
+          INVALID_STATE: number;
+          NOT_FOUND: number;
+          OBJECT_DESTROYED: number;
+          CONTENT_UNSUPPORTED_BY_BROWSER: number;
+          CONTENT_TYPE_NOT_SUPPORTED: number;
+          UNABLE_TO_GUESS_MANIFEST_TYPE: number;
+          DASH_INVALID_XML: number;
+          HLS_PLAYLIST_HEADER_MISSING: number;
+          INVALID_STREAMS_CHOSEN: number;
+          RESTRICTIONS_CANNOT_BE_MET: number;
+          COULD_NOT_GUESS_CODECS: number;
+          NO_VARIANTS: number;
+          PERIOD_FLATTENING_FAILED: number;
+          UNSUPPORTED_TEXT_TYPE: number;
+          CANNOT_ADD_EXTERNAL_TEXT_TO_LIVE_STREAM: number;
+          VIDEO_ERROR: number;
+          SEGMENT_MISSING: number;
+          TEXT_STREAM_NOT_SUPPORTED: number;
+          CANNOT_SATISFY_BYTE_LIMIT: number;
+          BAD_WEBVTT_CUE: number;
+          INVALID_MP4_VTT: number;
+          UNABLE_TO_EXTRACT_CUE_START_TIME: number;
+          BUFFER_READ_OUT_OF_BOUNDS: number;
+          JS_INTEGER_OVERFLOW: number;
+          EBML_OVERFLOW: number;
+          EBML_BAD_FLOATING_POINT_SIZE: number;
+          MP4_SIDX_WRONG_BOX_TYPE: number;
+          MP4_SIDX_INVALID_TIMESCALE: number;
+          MP4_SIDX_TYPE_NOT_SUPPORTED: number;
+          WEBM_CUES_ELEMENT_MISSING: number;
+          WEBM_EBML_HEADER_ELEMENT_MISSING: number;
+          WEBM_SEGMENT_ELEMENT_MISSING: number;
+          WEBM_INFO_ELEMENT_MISSING: number;
+          WEBM_DURATION_ELEMENT_MISSING: number;
+          WEBM_CUE_TRACK_POSITIONS_ELEMENT_MISSING: number;
+          WEBM_CUE_TIME_ELEMENT_MISSING: number;
+          MEDIA_SOURCE_OPERATION_FAILED: number;
+          MEDIA_SOURCE_OPERATION_THREW: number;
+          VIDEO_ERROR_UNKNOWN: number;
+          STREAMING_NOT_ALLOWED: number;
+          TEXT_COULD_NOT_GUESS_MIME_TYPE: number;
+          TEXT_COULD_NOT_GUESS_ENCODING: number;
+          COULD_NOT_DETECT_ENCODING: number;
+          TEXT_INVALID_MP4_VTT: number;
+          TEXT_INVALID_TTML: number;
+          TEXT_INVALID_XML: number;
+          TEXT_PARSER_NOT_REGISTERED: number;
+          DASH_UNSUPPORTED_XLINK_ACTUATE: number;
+          DASH_XLINK_DEPTH_LIMIT: number;
+          HLS_COULD_NOT_GUESS_CODECS: number;
+          HLS_KEYFORMATS_NOT_SUPPORTED: number;
+          DASH_UNSUPPORTED_CONTAINER: number;
+          DASH_PSSH_BAD_ENCODING: number;
+          DASH_NO_COMMON_KEY_SYSTEM: number;
+          DASH_MULTIPLE_KEY_IDS_NOT_SUPPORTED: number;
+          DASH_CONFLICTING_KEY_IDS: number;
+          UNPLAYABLE_PERIOD: number;
+          RESTRICTIONS_CANNOT_BE_MET_STRICT: number;
+          HLS_REQUIRED_ATTRIBUTE_MISSING: number;
+          HLS_INVALID_ATTRIBUTE: number;
+          HLS_REQUIRED_TAG_MISSING: number;
+          HLS_COULD_NOT_GUESS_MIME_TYPE: number;
+          HLS_MASTER_PLAYLIST_NOT_PROVIDED: number;
+          HLS_REQUIRED_ATTRIBUTE_MISSING_STRICT: number;
+          HLS_INVALID_ATTRIBUTE_STRICT: number;
+          MANIFEST_FILTER_NOT_FUNCTION: number;
+          INVALID_SEGMENT_INDEX: number;
+          CANNOT_ADD_EXTERNAL_TEXT_TO_SRC_EQUALS_MANIFEST: number;
+          HLS_AES_128_ENCRYPTION_NOT_SUPPORTED: number;
+          HLS_INTERNAL_SKIP_STREAM: number;
+          NO_RECOGNIZED_KEY_SYSTEMS: number;
+          REQUESTED_KEY_SYSTEM_CONFIG_UNAVAILABLE: number;
+          FAILED_TO_CREATE_CDM: number;
+          FAILED_TO_ATTACH_TO_VIDEO: number;
+          INVALID_SERVER_CERTIFICATE: number;
+          FAILED_TO_CREATE_SESSION: number;
+          FAILED_TO_GENERATE_LICENSE_REQUEST: number;
+          LICENSE_REQUEST_FAILED: number;
+          LICENSE_RESPONSE_REJECTED: number;
+          ENCRYPTED_CONTENT_WITHOUT_DRM_INFO: number;
+          NO_LICENSE_SERVER_GIVEN: number;
+          OFFLINE_SESSION_REMOVED: number;
+          EXPIRED: number;
+          SERVER_CERTIFICATE_REQUIRED: number;
+          INIT_DATA_TRANSFORM_ERROR: number;
+          SERVER_CERTIFICATE_REQUEST_FAILED: number;
+          NO_INIT_DATA_FOR_OFFLINE: number;
+          WRONG_KEYS: number;
+          LICENSE_REQUEST_NOT_SUPPORTED: number;
+          LICENSE_RESPONSE_NOT_SUPPORTED: number;
+          SWITCHING_KEY_SYSTEMS_DISABLED: number;
+          INVALID_CAST_RECEIVER_APPLICATION_ID: number;
+          CAST_UNAVAILABLE_STRICT: number;
+          CAST_CANCELED_BY_USER: number;
+          CAST_CONNECTION_TIMED_OUT: number;
+          CAST_RECEIVER_APP_UNAVAILABLE_STRICT: number;
+          STORAGE_NOT_SUPPORTED_STRICT: number;
+          INDEXED_DB_UNSUPPORTED_OPERATION: number;
+          INDEXED_DB_UNSUPPORTED_ON_PLATFORM: number;
+          LOCAL_PLAYER_INSTANCE_REQUIRED: number;
+          NEW_KEY_OPERATION_NOT_SUPPORTED: number;
+          KEY_NOT_FOUND: number;
+          LOCAL_PLAYER_INSTANCE_REQUIRED_STRICT: number;
+          MALFORMED_OFFLINE_URI: number;
+          CANNOT_STORE_LIVE_OFFLINE: number;
+          STORE_ALREADY_IN_PROGRESS: number;
+          NO_INIT_DATA_FOR_OFFLINE_STRICT: number;
+          MISSING_STORAGE_CELL: number;
+          MODIFY_OPERATION_NOT_SUPPORTED: number;
+          UNSUPPORTED_UPGRADE_REQUEST: number;
+          STORAGE_LIMIT_REACHED: number;
+        };
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "@smart-tv/player",
+  "version": "0.1.0",
+  "description": "A comprehensive Smart TV video player built with Shaka Player and spatial navigation support",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "scripts": {
+    "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --no-layer",
+    "build:components": "tsup",
+    "build": "pnpm run build:components & pnpm run build:styles",
+    "dev": "tsup --watch",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "smart-tv",
+    "video-player",
+    "shaka-player",
+    "spatial-navigation",
+    "react",
+    "typescript"
+  ],
+  "files": [
+    "dist/**"
+  ],
+  "dependencies": {
+    "@smart-tv/ui": "workspace:*",
+    "shaka-player": "^4.10.1"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "tsup": "^8.5.0",
+    "typescript": "^5.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

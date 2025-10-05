@@ -164,6 +164,7 @@
   },
   "dependencies": {
     "core-js": "^3.45.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "shaka-player": "^4.16.3"
   }
 }
