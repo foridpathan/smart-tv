@@ -1,0 +1,26 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "chrome": "30",
+          "firefox": "31",
+          "safari": "7",
+          "edge": "12",
+          "ie": "10"
+        },
+        "modules": false,
+        "useBuiltIns": "usage",
+        "corejs": false,
+        "shippedProposals": false,
+        "spec": false,
+        "loose": true,
+        "debug": false
+      }
+    ]
+  ],
+  "plugins": [
+    "babel-plugin-transform-remove-console"
+  ]
+}
