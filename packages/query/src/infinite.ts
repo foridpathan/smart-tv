@@ -68,7 +68,8 @@ export class InfiniteObserver<TPage = any> {
     this.hasNext = true
   }
 
-  getItems() {
-    return this.pages.flatMap(p => p.items)
+  getItems(): TPage[] {
+    // Use reduce instead of flatMap for Chrome 30+ compatibility
+    return this.pages.reduce<TPage[]>((acc, p) => acc.concat(p.items), [])
   }
 }
